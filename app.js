@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v4';
+const VERSION = 'v5';
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 
 // ruta: dentro de fau25.github.io. ext: se abre siempre aparte.
@@ -133,9 +133,12 @@ const SCRIPTS = [
   { id: 'tickets', nombre: 'Mis Tickets', tipo: 'Apps Script', exec: true },
   { id: 'habitos', nombre: 'Hábitos',     tipo: 'Apps Script · HÁBITOS', exec: true },
   { id: 'gym',     nombre: 'Mi Gym',      tipo: 'Apps Script · MI GYM', exec: true },
-  { id: 'viajes',  nombre: 'Mis viajes',  tipo: 'Conserje de Cloudflare', def: 'https://mis-viajes-ia.fgstrash.workers.dev' }
+  { id: 'viajes',  nombre: 'Mis viajes',  tipo: 'Conserje de Cloudflare · contraseña de la app', def: 'https://mis-viajes-ia.fgstrash.workers.dev' }
 ];
 const CLAVE_DIR = 'mis-apps-direcciones';
+const CLAVE_PASS = 'mis-apps-claves';
+let claves = {};
+try { claves = JSON.parse(leer(CLAVE_PASS) || '{}') || {}; } catch (e) { claves = {}; }
 let dirs = {};
 try { dirs = JSON.parse(leer(CLAVE_DIR) || '{}') || {}; } catch (e) { dirs = {}; }
 const btnDir = $('btnDir');
@@ -190,7 +193,34 @@ SCRIPTS.forEach((s) => {
     setTimeout(() => { copiar.textContent = 'Copiar'; }, 1500);
   });
   abrirB.addEventListener('click', () => { if (inp.value.trim()) window.open(inp.value.trim(), '_blank', 'noopener'); });
-  fila.append(info, inp, copiar, abrirB, aviso);
+  // Contraseña del script (oculta salvo que pulses «Ver»)
+  const pass = document.createElement('input');
+  pass.type = 'password'; pass.autocomplete = 'off'; pass.spellcheck = false;
+  pass.placeholder = 'Contraseña';
+  pass.setAttribute('aria-label', 'Contraseña de ' + s.nombre);
+  pass.value = claves[s.id] || '';
+  const ver = document.createElement('button');
+  ver.type = 'button'; ver.className = 'sec'; ver.textContent = 'Ver';
+  const copiarP = document.createElement('button');
+  copiarP.type = 'button'; copiarP.className = 'pri'; copiarP.textContent = 'Copiar';
+  copiarP.setAttribute('aria-label', 'Copiar la contraseña de ' + s.nombre);
+  const refrescarP = () => { copiarP.disabled = ver.disabled = !pass.value; };
+  pass.addEventListener('input', () => {
+    if (pass.value) claves[s.id] = pass.value; else delete claves[s.id];
+    guardar(CLAVE_PASS, JSON.stringify(claves)); refrescarP();
+  });
+  ver.addEventListener('click', () => {
+    const oculta = pass.type === 'password';
+    pass.type = oculta ? 'text' : 'password'; ver.textContent = oculta ? 'Ocultar' : 'Ver';
+    if (oculta) setTimeout(() => { pass.type = 'password'; ver.textContent = 'Ver'; }, 10000);   // se vuelve a ocultar sola
+  });
+  copiarP.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(pass.value); } catch (e) { return; }
+    copiarP.textContent = 'Copiada ✓';
+    setTimeout(() => { copiarP.textContent = 'Copiar'; }, 1500);
+  });
+  fila.append(info, inp, copiar, abrirB, pass, ver, copiarP, aviso);
+  refrescarP();
   $('filasDir').appendChild(fila);
   refrescar();
 });
