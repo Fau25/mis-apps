@@ -1,12 +1,11 @@
 'use strict';
-const VERSION = 'v5';
+const VERSION = 'v6';
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 
 // ruta: dentro de fau25.github.io. ext: se abre siempre aparte.
 const APPS = [
   { id: 'dia',      nombre: 'Mi Día',           ruta: '/organizador/',          d: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4' },
   { id: 'habitos',  nombre: 'Hábitos',          ruta: '/mis-habitos/',          d: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12l3 3 5-6' },
-  { id: 'gym',      nombre: 'Mi Gym',           ruta: '/mi-gym/',               d: 'M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12' },
   { id: 'compra',   nombre: 'Mi Compra',        ruta: '/lista-compra/web/',     d: 'M3 4h2l2 11h11l2-8H6M9 20h.01M17 20h.01' },
   { id: 'mascota',  nombre: 'Mi Mascota',       ruta: '/mi-mascota/',           d: 'M12 13c-3 0-5 3-5 5s2 2 5 2 5 0 5-2-2-5-5-5zM6.5 10.5h.01M17.5 10.5h.01M9.5 6.5h.01M14.5 6.5h.01' },
   { id: 'viajes',   nombre: 'Mis viajes',       ruta: '/mis-viajes/',           d: 'M6 8h12v12H6zM9 8V5h6v3M6 13h12' },
