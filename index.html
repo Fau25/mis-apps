@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Mis apps</title>
+<meta name="theme-color" content="#18181B">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+<link rel="preload" href="fuentes/inter-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<nav id="barra" aria-label="Apps">
+  <div class="logo" id="logo" title="Mis apps">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+  </div>
+  <div id="lista"></div>
+</nav>
+<main>
+  <header>
+    <div class="titulo">
+      <h1 id="nombre">Mis apps</h1>
+      <span id="dir"></span>
+    </div>
+    <button id="recargar" class="sec" type="button">Recargar</button>
+    <button id="aparte" class="pri" type="button">Abrir en ventana aparte</button>
+  </header>
+  <section id="marco">
+    <p id="cargando" hidden>Cargando…</p>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
