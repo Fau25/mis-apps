@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v2';
+const VERSION = 'v3';
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 
 // ruta: dentro de fau25.github.io. ext: se abre siempre aparte.
@@ -14,7 +14,6 @@ const APPS = [
   { id: 'pedidos',  nombre: 'Mis pedidos',      ruta: '/mis-pedidos/',          d: 'M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8' },
   { id: 'textil',   nombre: 'Pedidos textiles', ruta: '/pedidos-textil/',       d: 'M8 4L3 7l2 4 3-1v10h8V10l3 1 2-4-5-3c0 2-2 3-4 3s-4-1-4-3z' },
   { id: 'picaje',   nombre: 'Picaje Studio',    ext: 'https://claude.ai/artifact/3sBJDKricWYNvFEtZKnrwn', d: 'M7 4h10M7 20h10M8 4v16M16 4v16M8 9l8 3M8 13l8 3' },
-  { id: 'vectoriza',nombre: 'Vectoriza',        ruta: '/vectoriza-mascotas/',   d: 'M12 3l7 7-7 11-7-11zM12 3v8' },
   { id: 'pronos',   nombre: 'Pronósticos',      ruta: '/pronosticos/',          d: 'M5 20V11M12 20V5M19 20v-6M3 20h18' }
 ];
 
