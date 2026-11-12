@@ -18,6 +18,10 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
   </div>
   <div id="lista"></div>
+  <div class="hueco"></div>
+  <button id="btnDir" class="app" type="button" aria-label="Direcciones de los scripts">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+  </button>
 </nav>
 <main>
   <header>
@@ -30,6 +34,10 @@
   </header>
   <section id="marco">
     <p id="cargando" hidden>Cargando…</p>
+    <div id="direcciones" hidden>
+      <p class="nota">Se guardan solo en este ordenador (no van a GitHub). Pega cada dirección una vez y luego usa «Copiar».</p>
+      <div id="filasDir"></div>
+    </div>
   </section>
 </main>
 <script src="app.js"></script>

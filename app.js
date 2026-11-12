@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v1';
+const VERSION = 'v2';
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 
 // ruta: dentro de fau25.github.io. ext: se abre siempre aparte.
@@ -72,6 +72,7 @@ function abrir(id) {
   const a = APPS.find((x) => x.id === id);
   if (!a) return;
   if (a.ext) { window.open(a.ext, '_blank', 'noopener'); return; }
+  cerrarDirecciones();
   actual = a;
   guardar('mis-apps-ultima', id);
   history.replaceState(null, '', '#' + id);
@@ -123,6 +124,95 @@ $('aparte').addEventListener('click', () => {
   if (actual) window.open(actual.ruta, '_blank', 'noopener');
 });
 
+// ---- Direcciones de los scripts (solo en este ordenador, en localStorage) ----
+const SCRIPTS = [
+  { id: 'dia',     nombre: 'Mi Día',      tipo: 'Apps Script · MI DIA', exec: true },
+  { id: 'mascota', nombre: 'Mi Mascota',  tipo: 'Apps Script · MI MASCOTA', exec: true },
+  { id: 'compra',  nombre: 'Mi Compra',   tipo: 'Apps Script · MI COMPRA', exec: true,
+    def: 'https://script.google.com/macros/s/AKfycbxLGwL8uY56Q8Cl1CBQotiZIzz6NdHRpxFjn4kyqybkL5Or9g34nSiurC1aZ8VTjM6iaQ/exec' },
+  { id: 'pedidos', nombre: 'Mis pedidos', tipo: 'Apps Script', exec: true },
+  { id: 'tickets', nombre: 'Mis Tickets', tipo: 'Apps Script', exec: true },
+  { id: 'viajes',  nombre: 'Mis viajes',  tipo: 'Conserje de Cloudflare', def: 'https://mis-viajes-ia.fgstrash.workers.dev' }
+];
+const CLAVE_DIR = 'mis-apps-direcciones';
+let dirs = {};
+try { dirs = JSON.parse(leer(CLAVE_DIR) || '{}') || {}; } catch (e) { dirs = {}; }
+const btnDir = $('btnDir');
+const textoDir = 'Direcciones de los scripts';
+btnDir.addEventListener('mouseenter', () => mostrarGlobo(btnDir, textoDir));
+btnDir.addEventListener('focus', () => mostrarGlobo(btnDir, textoDir));
+btnDir.addEventListener('mouseleave', ocultarGlobo);
+btnDir.addEventListener('blur', ocultarGlobo);
+
+function avisoDe(s, v) {
+  if (!v) return '';
+  if (!/^https:\/\//.test(v)) return 'Debe empezar por https://';
+  if (s.exec && !/\/exec$/.test(v)) return 'Las direcciones de Apps Script deben acabar en /exec';
+  return '';
+}
+
+SCRIPTS.forEach((s) => {
+  const fila = document.createElement('div');
+  fila.className = 'fila';
+  const info = document.createElement('div');
+  const b = document.createElement('b'); b.textContent = s.nombre;
+  const sm = document.createElement('small'); sm.textContent = s.tipo;
+  info.append(b, sm);
+  const inp = document.createElement('input');
+  inp.type = 'url';
+  inp.spellcheck = false;
+  inp.placeholder = s.exec ? 'https://script.google.com/macros/s/…/exec' : 'https://…';
+  inp.setAttribute('aria-label', 'Dirección de ' + s.nombre);
+  inp.value = dirs[s.id] || s.def || '';
+  const copiar = document.createElement('button');
+  copiar.type = 'button'; copiar.className = 'pri'; copiar.textContent = 'Copiar';
+  const abrirB = document.createElement('button');
+  abrirB.type = 'button'; abrirB.className = 'sec'; abrirB.textContent = 'Abrir';
+  const aviso = document.createElement('span');
+  aviso.className = 'aviso';
+  aviso.setAttribute('role', 'status');
+  const refrescar = () => {
+    const v = inp.value.trim();
+    aviso.textContent = avisoDe(s, v);
+    copiar.disabled = abrirB.disabled = !v;
+  };
+  inp.addEventListener('input', () => {
+    const v = inp.value.trim();
+    if (v) dirs[s.id] = v; else delete dirs[s.id];
+    guardar(CLAVE_DIR, JSON.stringify(dirs));
+    refrescar();
+  });
+  copiar.addEventListener('click', async () => {
+    const v = inp.value.trim();
+    try { await navigator.clipboard.writeText(v); } catch (e) { inp.select(); document.execCommand('copy'); }
+    copiar.textContent = 'Copiada ✓';
+    setTimeout(() => { copiar.textContent = 'Copiar'; }, 1500);
+  });
+  abrirB.addEventListener('click', () => { if (inp.value.trim()) window.open(inp.value.trim(), '_blank', 'noopener'); });
+  fila.append(info, inp, copiar, abrirB, aviso);
+  $('filasDir').appendChild(fila);
+  refrescar();
+});
+
+function verDirecciones() {
+  vivas.forEach((fr) => { fr.hidden = true; });
+  cargando.hidden = true;
+  $('direcciones').hidden = false;
+  $('nombre').textContent = 'Direcciones de los scripts';
+  $('dir').textContent = 'Para copiar y pegar en Ajustes de cada app';
+  $('recargar').hidden = $('aparte').hidden = true;
+  document.title = 'Direcciones · Mis apps';
+  for (const b of Object.values(botones)) b.removeAttribute('aria-current');
+  btnDir.setAttribute('aria-current', 'page');
+  history.replaceState(null, '', '#direcciones');
+}
+function cerrarDirecciones() {
+  $('direcciones').hidden = true;
+  $('recargar').hidden = $('aparte').hidden = false;
+  btnDir.removeAttribute('aria-current');
+}
+btnDir.addEventListener('click', verDirecciones);
+
 // Atajos: Alt+1…9 para cambiar de app
 document.addEventListener('keydown', (e) => {
   if (!e.altKey || e.ctrlKey || e.metaKey) return;
@@ -132,7 +222,8 @@ document.addEventListener('keydown', (e) => {
 
 // Arranque: la de la dirección (#mi-app), la última usada o Mi Día
 const inicial = location.hash.slice(1) || leer('mis-apps-ultima') || 'dia';
-abrir(APPS.some((a) => a.id === inicial && !a.ext) ? inicial : 'dia');
+if (inicial === 'direcciones') verDirecciones();
+else abrir(APPS.some((a) => a.id === inicial && !a.ext) ? inicial : 'dia');
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
