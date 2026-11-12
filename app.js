@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v3';
+const VERSION = 'v4';
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 
 // ruta: dentro de fau25.github.io. ext: se abre siempre aparte.
@@ -131,6 +131,8 @@ const SCRIPTS = [
     def: 'https://script.google.com/macros/s/AKfycbxLGwL8uY56Q8Cl1CBQotiZIzz6NdHRpxFjn4kyqybkL5Or9g34nSiurC1aZ8VTjM6iaQ/exec' },
   { id: 'pedidos', nombre: 'Mis pedidos', tipo: 'Apps Script', exec: true },
   { id: 'tickets', nombre: 'Mis Tickets', tipo: 'Apps Script', exec: true },
+  { id: 'habitos', nombre: 'Hábitos',     tipo: 'Apps Script · HÁBITOS', exec: true },
+  { id: 'gym',     nombre: 'Mi Gym',      tipo: 'Apps Script · MI GYM', exec: true },
   { id: 'viajes',  nombre: 'Mis viajes',  tipo: 'Conserje de Cloudflare', def: 'https://mis-viajes-ia.fgstrash.workers.dev' }
 ];
 const CLAVE_DIR = 'mis-apps-direcciones';

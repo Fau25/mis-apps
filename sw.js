@@ -1,5 +1,5 @@
 // Solo cachea el propio panel (/mis-apps/). Cada app usa su propio service worker.
-const CACHE = 'mis-apps-v3';
+const CACHE = 'mis-apps-v4';
 const ARCHIVOS = ['./', 'index.html', 'estilos.css', 'app.js', 'manifest.json', 'icono.svg', 'icono-192.png', 'icono-512.png',
   'fuentes/inter-400.woff2', 'fuentes/inter-500.woff2', 'fuentes/inter-600.woff2'];
 self.addEventListener('install', (e) => {
