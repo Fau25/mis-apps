@@ -6,40 +6,92 @@
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Mis apps</title>
-<meta name="theme-color" content="#18181B">
+<meta name="theme-color" content="#1C1C1C">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icono.svg" type="image/svg+xml">
-<link rel="preload" href="fuentes/inter-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/jakarta-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/jakarta-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 <nav id="barra" aria-label="Apps">
-  <div class="logo" id="logo" title="Mis apps">
+  <button id="logo" class="logo" type="button" aria-label="Inicio">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
-  </div>
+  </button>
   <div id="lista"></div>
   <div class="hueco"></div>
-  <button id="btnDir" class="app" type="button" aria-label="Direcciones de los scripts">
+  <button id="btnScripts" class="app" type="button" aria-label="Scripts y contraseñas" aria-expanded="false" aria-controls="cajon">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
   </button>
 </nav>
-<main>
-  <header>
-    <div class="titulo">
-      <h1 id="nombre">Mis apps</h1>
-      <span id="dir"></span>
+
+<main id="panel">
+  <section id="inicio" aria-labelledby="saludo">
+    <div class="ancho">
+      <header class="cab">
+        <div class="titulo">
+          <h1 id="saludo">Inicio</h1>
+          <span id="fecha"></span>
+        </div>
+        <label class="buscar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></svg>
+          <span class="oculto">Buscar app</span>
+          <input id="buscar" type="search" placeholder="Buscar app" autocomplete="off" spellcheck="false">
+          <kbd aria-hidden="true">/</kbd>
+        </label>
+        <button id="abrirScripts" class="pildora oscura" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Scripts
+        </button>
+      </header>
+      <div class="subcab">
+        <h2>Mis apps</h2>
+        <span id="cuenta"></span>
+      </div>
+      <div id="rejilla" class="rejilla"></div>
+      <p id="sinResultados" class="vacio" hidden>Ninguna app coincide con la búsqueda.</p>
     </div>
-    <button id="recargar" class="sec" type="button">Recargar</button>
-    <button id="aparte" class="pri" type="button">Abrir en ventana aparte</button>
-  </header>
-  <section id="marco">
-    <p id="cargando" hidden>Cargando…</p>
-    <div id="direcciones" hidden>
-      <p class="nota">Direcciones y contraseñas de los scripts. Se guardan solo en este ordenador (no van a GitHub ni a Drive). Pégalas una vez y luego usa «Copiar».</p>
-      <div id="filasDir"></div>
+  </section>
+
+  <section id="vistaApp" hidden>
+    <header class="barraApp">
+      <div class="titulo">
+        <h1 id="nombre"></h1>
+        <span id="dir"></span>
+      </div>
+      <button id="recargar" class="pildora clara" type="button">Recargar</button>
+      <button id="aparte" class="pildora oscura" type="button">Abrir aparte</button>
+    </header>
+    <div id="marco">
+      <p id="cargando" hidden>Cargando…</p>
     </div>
   </section>
 </main>
+
+<div id="velo" hidden></div>
+<aside id="cajon" role="dialog" aria-modal="true" aria-labelledby="tituloCajon" hidden>
+  <header class="cabCajon">
+    <div class="titulo">
+      <h2 id="tituloCajon">Scripts</h2>
+      <span id="cuentaScripts"></span>
+    </div>
+    <button id="cerrarCajon" class="redondo" type="button" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </header>
+  <label class="buscar enCajon">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></svg>
+    <span class="oculto">Buscar script</span>
+    <input id="buscarScript" type="search" placeholder="Buscar" autocomplete="off" spellcheck="false">
+  </label>
+  <div id="filas" class="filas"></div>
+  <p class="notaCajon">Direcciones y contraseñas se guardan solo en este ordenador.</p>
+  <div class="pieCajon">
+    <button id="anadir" class="pildora oscura ancha" type="button">+ Añadir script</button>
+  </div>
+</aside>
+
+<div id="aviso" role="status" hidden><span id="avisoTexto"></span><button id="deshacer" type="button" hidden>Deshacer</button></div>
+
 <script src="app.js"></script>
 </body>
 </html>

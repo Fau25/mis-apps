@@ -1,7 +1,7 @@
 // Solo cachea el propio panel (/mis-apps/). Cada app usa su propio service worker.
-const CACHE = 'mis-apps-v6';
+const CACHE = 'mis-apps-v7';
 const ARCHIVOS = ['./', 'index.html', 'estilos.css', 'app.js', 'manifest.json', 'icono.svg', 'icono-192.png', 'icono-512.png',
-  'fuentes/inter-400.woff2', 'fuentes/inter-500.woff2', 'fuentes/inter-600.woff2'];
+  'fuentes/jakarta-400.woff2', 'fuentes/jakarta-500.woff2', 'fuentes/jakarta-600.woff2', 'fuentes/jakarta-700.woff2', 'fuentes/jakarta-800.woff2'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARCHIVOS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
