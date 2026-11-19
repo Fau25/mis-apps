@@ -1,5 +1,6 @@
 'use strict';
-const VERSION = 'v7';
+const VERSION = 'v8';
+const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
 
@@ -125,7 +126,7 @@ function pintarInicio() {
     const c = el('div', 'continuar');
     const t = el('div', 'txt');
     t.append(el('b', '', 'Seguir con ' + ultima.nombre),
-      el('small', '', 'La última app que abriste. Alt+1…9 salta entre apps y Alt+0 vuelve aquí.'));
+      el('small', '', MOVIL.matches ? '' : 'La última app que abriste. Alt+1…9 salta entre apps y Alt+0 vuelve aquí.'));
     const b = el('button', 'pildora', 'Abrir ' + ultima.nombre);
     b.type = 'button';
     b.addEventListener('click', () => abrir(ultima.id));
@@ -158,6 +159,7 @@ function abrir(id) {
   const a = APPS.find((x) => x.id === id);
   if (!a) return;
   if (a.ext) { window.open(a.ext, '_blank', 'noopener'); return; }
+  if (MOVIL.matches) { guardar('mis-apps-ultima', id); location.href = a.ruta; return; }
   cerrarCajon(false);
   actual = a;
   guardar('mis-apps-ultima', id);
@@ -389,7 +391,7 @@ function abrirCajon() {
   pintarScripts();
   $('velo').hidden = $('cajon').hidden = false;
   $('btnScripts').setAttribute('aria-expanded', 'true');
-  $('buscarScript').focus();
+  if (!MOVIL.matches) $('buscarScript').focus(); else $('cerrarCajon').focus();
 }
 function cerrarCajon(devolverFoco = true) {
   if ($('cajon').hidden) return;
@@ -425,7 +427,7 @@ function atajosApps(e) {
 
 // ---- Arranque: #mi-app abre esa app; si no, el Inicio ----
 const inicial = location.hash.slice(1);
-if (APPS.some((a) => a.id === inicial && !a.ext)) abrir(inicial);
+if (APPS.some((a) => a.id === inicial && !a.ext) && !MOVIL.matches) abrir(inicial);
 else {
   mostrarInicio();
   if (inicial === 'scripts' || inicial === 'direcciones') abrirCajon();
