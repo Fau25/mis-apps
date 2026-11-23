@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v11';
+const VERSION = 'v12';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -106,7 +106,9 @@ function pintarInicio() {
     f.type = 'button';
     f.dataset.id = a.id;
     const arriba = el('span', 'arriba');
-    const tile = el('span', 'tile'); tile.appendChild(icono(a.d));
+    const tile = el('span', 'tile');
+    const img = el('img'); img.src = 'iconos/' + a.id + '.svg'; img.alt = ''; img.width = 64; img.height = 64; img.decoding = 'async';
+    tile.appendChild(img);
     const marca = el('span', 'marca');
     if (a.ext) marca.textContent = 'Aparte ↗';
     else if (vivas.has(a.id)) { marca.appendChild(el('i')); marca.append('Abierta'); }
