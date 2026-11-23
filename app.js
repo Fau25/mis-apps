@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v12';
+const VERSION = 'v13';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];

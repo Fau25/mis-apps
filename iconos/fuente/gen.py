@@ -8,7 +8,7 @@ DEFS = '''<defs>
 <filter id="de" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.1"/></filter>
 </defs>'''
 def svg(body):
-    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">{DEFS}<g filter="url(#so)">{body}</g></svg>'
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">{DEFS}{body}</svg>'
 
 I = {}
 # Mi Día · calendario
@@ -19,12 +19,11 @@ I['dia'] = svg(f'''<rect x="10" y="13" width="44" height="43" rx="11" fill="url(
 <rect x="10.6" y="13.6" width="42.8" height="41.8" rx="10.4" fill="none" stroke="url(#br)" stroke-width="1.2"/>
 <rect x="20" y="7" width="6" height="13" rx="3" fill="url(#cl)"/><rect x="38" y="7" width="6" height="13" rx="3" fill="url(#cl)"/>''')
 # Hábitos · check
-I['habitos'] = svg('''<circle cx="34" cy="30" r="20" fill="url(#co)" filter="url(#de)" opacity=".75"/>
-<circle cx="31" cy="34" r="21" fill="url(#cv)"/>
+I['habitos'] = svg('''<circle cx="31" cy="34" r="21" fill="url(#cv)"/>
 <circle cx="31" cy="34" r="20.4" fill="none" stroke="url(#br)" stroke-width="1.2"/>
 <path d="M21.5 34.5l6.5 6.5 13.5-14" fill="none" stroke="url(#co)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>''')
 # Mi Compra · bolsa
-I['compra'] = svg('''<path d="M20 22h26l4 30a5 5 0 0 1-5 5H24" fill="url(#co)" filter="url(#de)" opacity=".7"/>
+I['compra'] = svg('''<path d="M20 22h26l4 30a5 5 0 0 1-5 5H24" fill="url(#co)" opacity=".7"/>
 <path d="M16 24h30l3 27a6 6 0 0 1-6 6.5H19a6 6 0 0 1-6-6.5z" fill="url(#cv)"/>
 <path d="M16.6 24.6h28.8" stroke="url(#br)" stroke-width="1.4"/>
 <path d="M23 29v-8a8 8 0 0 1 16 0v8" fill="none" stroke="url(#co)" stroke-width="3.6" stroke-linecap="round"/>''')
@@ -43,7 +42,7 @@ I['viajes'] = svg('''<path d="M25 20v-5a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v5" fill="n
 <circle cx="18" cy="58" r="2.6" fill="url(#co)"/><circle cx="46" cy="58" r="2.6" fill="url(#co)"/>''')
 # Mis Tickets · recibo
 zz = 'M14 10h30a4 4 0 0 1 4 4v40l-4.5-3-4.5 3-4.5-3-4.5 3-4.5-3-4.5 3-4.5-3-3 2V14a4 4 0 0 1 4-4z'
-I['tickets'] = svg(f'''<path d="{zz}" transform="translate(6 2)" fill="url(#co)" filter="url(#de)" opacity=".7"/>
+I['tickets'] = svg(f'''<path d="{zz}" transform="translate(6 2)" fill="url(#co)" opacity=".7"/>
 <path d="{zz}" fill="url(#cv)"/>
 <path d="M14.6 10.6h29" stroke="url(#br)" stroke-width="1.4"/>
 <rect x="18" y="20" width="20" height="3.4" rx="1.7" fill="url(#co)"/><rect x="18" y="29" width="24" height="3.4" rx="1.7" fill="url(#cm)"/>
