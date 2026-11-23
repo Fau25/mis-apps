@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v9';
+const VERSION = 'v10';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -18,6 +18,7 @@ const APPS = [
 const IC = {
   enlace: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
   candado: 'M8 11V8a4 4 0 0 1 8 0v3M6 11h12v9H6z',
+  flecha: 'M5 12h14M13 6l6 6-6 6',
   abajo: 'M6 9l6 6 6-6', arriba: 'M6 15l6-6 6 6', ok: 'M5 12l5 5 9-10'
 };
 
@@ -104,7 +105,6 @@ function pintarInicio() {
     const f = el('button', 'ficha');
     f.type = 'button';
     f.dataset.id = a.id;
-    f.style.background = PASTEL[i % PASTEL.length];
     const arriba = el('span', 'arriba');
     const tile = el('span', 'tile'); tile.appendChild(icono(a.d));
     const marca = el('span', 'marca');
@@ -113,7 +113,8 @@ function pintarInicio() {
     arriba.append(tile, marca);
     const txt = el('span');
     txt.append(el('b', '', a.nombre), el('small', '', a.desc));
-    f.append(arriba, txt);
+    const flecha = el('span', 'flecha'); flecha.appendChild(icono(IC.flecha));
+    f.append(arriba, txt, flecha);
     f.setAttribute('aria-label', a.nombre + ', ' + a.desc);
     f.addEventListener('click', () => abrir(a.id));
     r.appendChild(f);
@@ -122,13 +123,14 @@ function pintarInicio() {
   const ultima = APPS.find((a) => a.id === leer('mis-apps-ultima') && !a.ext) || APPS[0];
   if (!q) {
     const c = el('div', 'continuar');
+    const ico = el('span', 'ico'); ico.appendChild(icono(ultima.d));
     const t = el('div', 'txt');
     t.append(el('b', '', 'Seguir con ' + ultima.nombre),
-      el('small', '', MOVIL.matches ? '' : 'La última app que abriste. Alt+1…9 salta entre apps y Alt+0 vuelve aquí.'));
-    const b = el('button', 'pildora', 'Abrir ' + ultima.nombre);
+      el('small', '', 'La última app que abriste. Alt+1…9 salta entre apps y Alt+0 vuelve aquí.'));
+    const b = el('button', 'pildora', 'Abrir');
     b.type = 'button';
     b.addEventListener('click', () => abrir(ultima.id));
-    c.append(t, b);
+    c.append(ico, t, b);
     r.appendChild(c);
   }
   $('sinResultados').hidden = visibles.length > 0;
@@ -395,12 +397,21 @@ function cerrarCajon(devolverFoco = true) {
   if ($('cajon').hidden) return;
   $('velo').hidden = $('cajon').hidden = true;
   $('btnScripts').setAttribute('aria-expanded', 'false');
+  navActivo($('buscar').closest('.buscar').classList.contains('ver') ? 'nBuscar' : 'nInicio');
   if (devolverFoco && ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
 }
 $('btnScripts').addEventListener('click', () => ($('cajon').hidden ? abrirCajon() : cerrarCajon()));
 $('abrirScripts').addEventListener('click', abrirCajon);
 $('cerrarCajon').addEventListener('click', () => cerrarCajon());
 $('velo').addEventListener('click', () => cerrarCajon());
+
+// ---- Menú inferior (móvil) ----
+function navActivo(id) {
+  ['nInicio', 'nBuscar', 'nScripts'].forEach((k) => $(k).classList.toggle('activo', k === id));
+}
+$('nInicio').addEventListener('click', () => { cerrarCajon(false); $('buscar').closest('.buscar').classList.remove('ver'); $('buscar').value = ''; pintarInicio(); navActivo('nInicio'); $('inicio').scrollTo({ top: 0, behavior: 'smooth' }); });
+$('nBuscar').addEventListener('click', () => { cerrarCajon(false); const l = $('buscar').closest('.buscar'); l.classList.add('ver'); navActivo('nBuscar'); $('buscar').focus(); });
+$('nScripts').addEventListener('click', () => { abrirCajon(); navActivo('nScripts'); });
 
 // ---- Teclado ----
 document.addEventListener('keydown', (e) => {
