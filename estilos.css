@@ -69,7 +69,7 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:#fff;border-radius:6px
 .ficha .marca i{width:7px;height:7px;border-radius:50%;background:#2F9E5B}
 .ficha b{display:block;font-size:15px;font-weight:700}
 .ficha small{display:block;margin-top:3px;font-size:12.5px;color:#4A4F59;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.continuar{grid-column:span 2;height:136px;border-radius:20px;background:var(--marco);color:#fff;padding:20px 24px;display:flex;align-items:center;gap:20px}
+.continuar{grid-column:1/-1;height:92px;border-radius:20px;background:var(--marco);color:#fff;padding:20px 24px;display:flex;align-items:center;gap:20px}
 .continuar .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .continuar b{font-size:16px;font-weight:700}
 .continuar small{font-size:12.5px;color:#BDBEC4;line-height:1.5}
@@ -133,8 +133,8 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:#fff;border-radius:6px
 #aviso:not(:has(#deshacer:not([hidden]))){padding-right:16px}
 #deshacer{height:30px;padding:0 12px;border-radius:9px;border:none;background:#CFE3FB;color:var(--tinta);font-size:12.5px;font-weight:700}
 
-@media (max-width:1180px){#inicio{padding:40px 40px 48px}.rejilla{grid-template-columns:repeat(3,minmax(0,1fr))}.continuar{grid-column:span 3}}
-@media (max-width:820px){.rejilla{grid-template-columns:repeat(2,minmax(0,1fr))}.continuar{grid-column:span 2}.buscar{width:170px}#inicio{padding:32px 24px}}
+@media (max-width:1180px){#inicio{padding:40px 40px 48px}.rejilla{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:820px){.rejilla{grid-template-columns:repeat(2,minmax(0,1fr))}.buscar{width:170px}#inicio{padding:32px 24px}}
 /* ---- Móvil: sin barra lateral; cada app se abre a pantalla completa ---- */
 @media (max-width:700px){
   #barra{display:none}
@@ -150,7 +150,7 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:#fff;border-radius:6px
   .ficha .tile{width:34px;height:34px;border-radius:10px}
   .ficha b{font-size:14px}
   .ficha small{font-size:12px}
-  .continuar{grid-column:span 2;height:auto;flex-direction:column;align-items:stretch;gap:14px;padding:18px}
+  .continuar{height:auto;flex-direction:column;align-items:stretch;gap:14px;padding:18px}
   .continuar small{display:none}
   kbd{display:none}
   #cajon{top:8px;right:8px;bottom:8px;left:8px;width:auto;max-width:none;border-radius:22px}

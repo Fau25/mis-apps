@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v8';
+const VERSION = 'v9';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -13,8 +13,6 @@ const APPS = [
   { id: 'viajes',  nombre: 'Mis viajes',       desc: 'Planes de viaje',          ruta: '/mis-viajes/',       d: 'M6 8h12v12H6zM9 8V5h6v3M6 13h12' },
   { id: 'tickets', nombre: 'Mis Tickets',      desc: 'Garantías y devoluciones', ruta: '/mis-tickets/',      d: 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6' },
   { id: 'pedidos', nombre: 'Mis pedidos',      desc: 'Envíos y entregas',        ruta: '/mis-pedidos/',      d: 'M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8' },
-  { id: 'textil',  nombre: 'Pedidos textiles', desc: 'Pedidos del taller',       ruta: '/pedidos-textil/',   d: 'M8 4L3 7l2 4 3-1v10h8V10l3 1 2-4-5-3c0 2-2 3-4 3s-4-1-4-3z' },
-  { id: 'picaje',  nombre: 'Picaje Studio',    desc: 'Se abre en otra pestaña',  ext: 'https://claude.ai/artifact/3sBJDKricWYNvFEtZKnrwn', d: 'M7 4h10M7 20h10M8 4v16M16 4v16M8 9l8 3M8 13l8 3' },
   { id: 'pronos',  nombre: 'Pronósticos',      desc: 'Pronósticos deportivos',   ruta: '/pronosticos/',      d: 'M5 20V11M12 20V5M19 20v-6M3 20h18' }
 ];
 const IC = {
