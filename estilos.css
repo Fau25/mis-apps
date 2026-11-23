@@ -1,5 +1,6 @@
-/* Estilo «niebla»: fondo gris difuminado, tarjetas blancas muy redondeadas, blanco y negro,
-   títulos en serif (DM Serif Display) y texto en DM Sans. Activo = píldora negra. */
+/* Estilo «Aurora · Alba»: fondo claro con brumas lavanda, menta y melocotón; tarjetas de cristal blanco;
+   títulos en Instrument Serif y texto en Sora. Activo = píldora melocotón. (Las fuentes conservan los
+   nombres de archivo serif-400 / sans-*.) La capa Alba va al final y manda sobre lo anterior. */
 @font-face{font-family:Titular;font-weight:400;font-display:swap;src:url(fuentes/serif-400.woff2) format('woff2')}
 @font-face{font-family:Texto;font-weight:400;font-display:swap;src:url(fuentes/sans-400.woff2) format('woff2')}
 @font-face{font-family:Texto;font-weight:500;font-display:swap;src:url(fuentes/sans-500.woff2) format('woff2')}
@@ -190,5 +191,66 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:var(--suave);border-ra
   #cajon{top:10px;right:10px;bottom:10px;left:10px;width:auto;max-width:none;border-radius:30px}
   .script .linea{height:60px}
   .icob{width:40px;height:40px}
+}
+/* ================= Capa «Alba» (v14) ================= */
+:root{--tinta:#2A2433;--sec:#857D92;--suave:rgba(255,255,255,.7);--linea:rgba(42,36,51,.08);--negro:#2A2433;
+  --tarjeta:rgba(255,255,255,.6);--borde:1px solid rgba(255,255,255,.95);--sombra:0 10px 30px rgba(120,100,140,.10),0 1px 3px rgba(120,100,140,.06);
+  --acento:#FFCBB3;--acentoHover:#FFBDA0;--foco:#9B87E8;
+  --g1:linear-gradient(135deg,#D3C6FF,#B5E9D8);--g2:linear-gradient(135deg,#FFC9B8,#D3C6FF);--g3:linear-gradient(135deg,#B5E9D8,#F8E7B0)}
+body{background:#F3EEF1;background-image:radial-gradient(60% 45% at 8% 4%,rgba(190,172,255,.5),transparent 70%),radial-gradient(50% 40% at 96% 24%,rgba(160,226,205,.4),transparent 70%),
+  radial-gradient(55% 45% at 70% 102%,rgba(255,186,164,.45),transparent 70%);background-attachment:fixed}
+h1,h2{letter-spacing:-.015em}
+#barra{background:rgba(255,255,255,.6);border:var(--borde)}
+.logo{background:var(--g1);color:var(--tinta)}
+.logo[aria-current="page"],.app[aria-current="page"],.app[aria-expanded="true"]{background:var(--acento);color:var(--tinta)}
+.app{background:transparent;color:#5E566E}
+.app:hover{background:rgba(255,255,255,.75)}
+.app.abierta::after{background:#B9A9F0;border-color:#F7F3F6}
+.globo{background:var(--tinta)}
+.cab h1{font-size:52px;background:linear-gradient(90deg,#2A2433,#7A68C9 70%,#4FA88E);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:4px}
+.buscar{background:var(--tarjeta);border:var(--borde);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.redondo{background:rgba(255,255,255,.65);border:var(--borde)}
+.redondo:hover,.redondo.grande:hover{background:#fff}
+.redondo.grande{background:var(--tarjeta);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.oscura,.mini{background:var(--acento);color:var(--tinta)}
+.oscura:hover,.mini:hover:not(:disabled){background:var(--acentoHover)}
+.subcab h2{font-size:28px}
+.ficha{height:176px;border-radius:26px;background:var(--tarjeta);border:var(--borde);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:20px}
+.ficha:hover{box-shadow:0 18px 40px rgba(120,100,140,.16),0 1px 3px rgba(120,100,140,.06)}
+.ficha .arriba{justify-content:flex-start;padding:0 0 14px}
+.ficha .tile{width:44px;height:44px;border-radius:15px;background:var(--g1);color:var(--tinta)}
+.ficha:nth-child(3n+2) .tile{background:var(--g2)}.ficha:nth-child(3n) .tile{background:var(--g3)}
+.ficha .tile svg{width:21px;height:21px;stroke-width:1.7;transition:transform .25s}
+.ficha:hover .tile svg{transform:scale(1.08)}
+.ficha .marca i{background:#B9A9F0}
+.ficha b{font-family:Texto,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.01em}
+.ficha small{font-size:12.5px}
+.ficha .flecha{color:#A39BB0}
+.continuar{color:var(--tinta);background:linear-gradient(100deg,rgba(211,198,255,.75),rgba(181,233,216,.55));border:var(--borde);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.continuar small{color:#6E6680}
+.continuar .pildora{background:var(--acento);color:var(--tinta)}
+.continuar .pildora:hover{background:var(--acentoHover)}
+#marco{border:var(--borde)}
+#velo{background:rgba(90,76,110,.18)}
+#cajon{background:rgba(250,247,249,.92);border:var(--borde);box-shadow:0 24px 60px rgba(90,76,110,.18)}
+.buscar.enCajon{background:rgba(42,36,51,.05);border:none}
+.script.abierto{background:rgba(211,198,255,.22)}
+.script .ini{color:#5E566E;filter:none}
+.icob:hover:not(:disabled),.icob.hecho{background:rgba(42,36,51,.06)}
+.campo input{border-color:rgba(42,36,51,.12)}
+#aviso{background:var(--tinta)}
+#deshacer{background:var(--acento)}
+@media (max-width:700px){
+  .cab h1{font-size:40px}
+  .subcab h2{font-size:23px}
+  .ficha{height:auto;min-height:112px;border-radius:24px;padding:14px}
+  .ficha .arriba{padding:0 0 10px}
+  .ficha .tile{width:40px;height:40px;border-radius:14px}
+  .ficha .tile svg{width:20px;height:20px}
+  .ficha b{font-size:15.5px}
+  .ficha small{font-size:11.5px}
+  #navMovil{background:rgba(255,255,255,.72);border:var(--borde);box-shadow:0 10px 30px rgba(120,100,140,.14)}
+  .nb{background:transparent;color:#6E6680;font-family:Texto,system-ui,sans-serif;font-weight:600;font-size:14px}
+  .nb.activo{background:var(--acento);color:var(--tinta)}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
