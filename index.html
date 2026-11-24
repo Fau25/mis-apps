@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
+<noscript><p style="padding:24px;font:16px system-ui">Mis apps necesita JavaScript activado.</p></noscript>
 <nav id="barra" aria-label="Apps">
   <button id="logo" class="logo" type="button" aria-label="Inicio">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
@@ -81,7 +82,7 @@
 </nav>
 
 <div id="velo" hidden></div>
-<aside id="cajon" role="dialog" aria-modal="true" aria-labelledby="tituloCajon" hidden>
+<div id="cajon" role="dialog" aria-modal="true" aria-labelledby="tituloCajon" hidden>
   <header class="cabCajon">
     <div class="titulo">
       <h2 id="tituloCajon">Scripts</h2>
@@ -106,7 +107,7 @@
     </div>
     <button id="anadir" class="pildora oscura ancha" type="button">+ Añadir script</button>
   </div>
-</aside>
+</div>
 
 <div id="aviso" role="status" hidden><span id="avisoTexto"></span><button id="deshacer" type="button" hidden>Deshacer</button></div>
 

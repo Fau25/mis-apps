@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v23';
+const VERSION = 'v24';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -118,7 +118,6 @@ function pintarInicio() {
     txt.append(el('b', '', a.nombre), el('small', '', a.desc));
     const flecha = el('span', 'flecha'); flecha.appendChild(icono(IC.flecha));
     f.append(arriba, txt, flecha);
-    f.setAttribute('aria-label', a.nombre + ', ' + a.desc);
     f.addEventListener('click', () => abrir(a.id));
     r.appendChild(f);
   });
@@ -472,7 +471,7 @@ $('archivoImportar').addEventListener('change', async (e) => {
     if (!x || typeof x.nombre !== 'string') continue;
     // Se empareja por id y, si no, por nombre; si no existe, se añade
     let s = scripts.find((y) => y.id === x.id) || scripts.find((y) => y.nombre.trim().toLowerCase() === x.nombre.trim().toLowerCase());
-    if (!s) { s = { id: typeof x.id === 'string' && x.id ? x.id : 's' + Date.now().toString(36) + nuevos, nombre: x.nombre.slice(0, 60), tipo: x.tipo || 'Apps Script' }; scripts.push(s); nuevos++; }
+    if (!s) { s = { id: typeof x.id === 'string' && /^[a-z0-9_-]{1,40}$/i.test(x.id) ? x.id : 's' + Date.now().toString(36) + nuevos, nombre: x.nombre.slice(0, 60), tipo: x.tipo || 'Apps Script' }; scripts.push(s); nuevos++; }
     else actualizados++;
     if (typeof x.direccion === 'string' && /^https:\/\//.test(x.direccion.trim())) dirs[s.id] = x.direccion.trim();
   }

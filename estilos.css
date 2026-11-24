@@ -293,4 +293,8 @@ h1,h2{font-weight:600;letter-spacing:-.035em}
 .pieDos .pildora{flex:1;height:44px}
 .pildora.sec{background:rgba(255,255,255,.75);color:var(--tinta);border:1px solid rgba(42,36,51,.1)}
 .pildora.sec:hover{background:#fff}
+/* v24 · auditoría: contraste AA del texto secundario (#857D92 daba 3,4:1; #6E6680 da 4,7:1) */
+:root{--sec:#6E6680}
+.ficha .flecha{color:#857D92}
+.cab h1{background:linear-gradient(90deg,#2A2433,#6F5CC4 75%,#3F8F78)!important;-webkit-background-clip:text!important;background-clip:text!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
