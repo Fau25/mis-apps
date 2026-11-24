@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v15';
+const VERSION = 'v16';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -237,6 +237,23 @@ const dirs = leerJSON(CLAVE_DIR, {}) || {};
 const claves = leerJSON(CLAVE_PASS, {}) || {};
 // La dirección por defecto cuenta como guardada (así se puede borrar o cambiar)
 scripts.forEach((s) => { if (s.def && !(s.id in dirs)) dirs[s.id] = s.def; delete s.def; });
+// Todas las apps viven en fau25.github.io y comparten el almacenamiento del navegador: si una app ya tiene
+// su script conectado en este dispositivo, se toma de ahí la dirección (nunca la contraseña, que pone el usuario).
+// Así no hace falta escribir ninguna dirección en el código público.
+const DIR_EN_APP = {
+  dia:     () => leerJSON('midia-v1', {})?.cfg?.url,
+  mascota: () => leerJSON('mm-cfg', {})?.url,
+  compra:  () => leerJSON('mc-ajustes', {})?.url,
+  pedidos: () => leerJSON('mp-cfg', {})?.url,
+  tickets: () => { try { return localStorage.getItem('mt-url'); } catch (e) { return ''; } },
+  habitos: () => leerJSON('habitos-sync', {})?.url,
+  gym:     () => leerJSON('migym-sync', {})?.url,
+};
+scripts.forEach((s) => {
+  if (dirs[s.id] && !(s.id === 'compra' && /AKfycbxLGwL8/.test(dirs[s.id]))) return;   // ya tiene una (la de Mi Compra de serie se puede mejorar)
+  let u = ''; try { u = (DIR_EN_APP[s.id] && DIR_EN_APP[s.id]()) || ''; } catch (e) {}
+  if (typeof u === 'string' && /^https:\/\/script\.google(usercontent)?\.com\//.test(u.trim())) dirs[s.id] = u.trim();
+});
 const guardarTodo = () => {
   guardar(CLAVE_LISTA, JSON.stringify(scripts));
   guardar(CLAVE_DIR, JSON.stringify(dirs));
