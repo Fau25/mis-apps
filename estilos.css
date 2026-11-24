@@ -99,7 +99,7 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:var(--suave);border-ra
 .continuar .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .continuar b{font-size:15px;font-weight:600;letter-spacing:-.02em}
 .continuar small{font-size:13px;color:#6E6680}
-.continuar .pildora{background:var(--acento);color:var(--tinta)}
+.continuar .pildora{background:var(--acento);color:var(--tinta);height:44px}
 .continuar .pildora:hover{background:var(--acentoHover)}
 .vacio{margin:32px 0 0;text-align:center;color:var(--sec);font-size:14px}
 
