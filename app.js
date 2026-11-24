@@ -1,7 +1,7 @@
 'use strict';
-const VERSION = 'v17';
-const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
-const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
+const VERSION = 'v18';
+const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
+const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
 
 // ruta: dentro de fau25.github.io. ext: se abre siempre aparte.
@@ -85,6 +85,8 @@ APPS.forEach((a, i) => {
 conGlobo($('logo'), 'Inicio  ·  Alt+0');
 conGlobo($('btnScripts'), 'Scripts y contraseñas');
 $('logo').addEventListener('click', mostrarInicio);
+$('volverApp').addEventListener('click', mostrarInicio);
+addEventListener('popstate', () => { if (actual) { actualEnHistorial = false; mostrarInicio(); } });
 
 // ---- Inicio ----
 function saludo() {
@@ -143,8 +145,11 @@ $('buscar').addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { $('buscar').value = ''; pintarInicio(); $('buscar').blur(); }
 });
 
+let actualEnHistorial = false;
 function mostrarInicio() {
+  if (actualEnHistorial) { actualEnHistorial = false; history.back(); return; }   // popstate vuelve a llamar aquí
   actual = null;
+  document.body.classList.remove('con-app');
   $('vistaApp').hidden = true;
   $('inicio').hidden = false;
   for (const b of Object.values(botones)) b.removeAttribute('aria-current');
@@ -160,11 +165,13 @@ function abrir(id) {
   const a = APPS.find((x) => x.id === id);
   if (!a) return;
   if (a.ext) { window.open(a.ext, '_blank', 'noopener'); return; }
-  if (MOVIL.matches) { guardar('mis-apps-ultima', id); location.href = a.ruta; return; }
   cerrarCajon(false);
   actual = a;
   guardar('mis-apps-ultima', id);
-  history.replaceState(null, '', '#' + id);
+  // En el móvil se apunta en el historial: el gesto o botón «atrás» vuelve al Inicio
+  if (MOVIL.matches && !actualEnHistorial) { history.pushState({ app: id }, '', '#' + id); actualEnHistorial = true; }
+  else history.replaceState(history.state, '', '#' + id);
+  document.body.classList.add('con-app');
   document.title = a.nombre + ' · Mis apps';
   $('inicio').hidden = true;
   $('vistaApp').hidden = false;
@@ -466,7 +473,7 @@ function atajosApps(e) {
 
 // ---- Arranque: #mi-app abre esa app; si no, el Inicio ----
 const inicial = location.hash.slice(1);
-if (APPS.some((a) => a.id === inicial && !a.ext) && !MOVIL.matches) abrir(inicial);
+if (APPS.some((a) => a.id === inicial && !a.ext)) abrir(inicial);
 else {
   mostrarInicio();
   if (inicial === 'scripts' || inicial === 'direcciones') abrirCajon();

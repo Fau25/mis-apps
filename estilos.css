@@ -273,4 +273,17 @@ h1,h2{font-weight:600;letter-spacing:-.035em}
 .mini.sec:hover:not(:disabled){background:#fff}
 .mini.hecho{background:#B5E9D8!important}
 .fila2 .mini{flex:none}
+/* v18 · en el móvil la app se abre dentro del panel, a pantalla completa, con una barra fina para volver */
+#volverApp{display:none}
+@media (max-width:700px){
+  body.con-app #navMovil{display:none}
+  #vistaApp{position:fixed;inset:0;z-index:20;background:#F3EEF1}
+  #vistaApp .barraApp{height:auto;min-height:52px;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;gap:10px}
+  #volverApp{display:flex;width:40px;height:40px;flex:none}
+  #volverApp svg{width:20px;height:20px}
+  #vistaApp .barraApp h1{font-size:18px;letter-spacing:-.02em}
+  #vistaApp #dir,#vistaApp #aparte{display:none}
+  #vistaApp #recargar{width:40px;height:40px}
+  #marco{margin:0;border-radius:0;border:0;box-shadow:none;padding-bottom:0}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
