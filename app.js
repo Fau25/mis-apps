@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v19';
+const VERSION = 'v20';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -423,14 +423,13 @@ $('anadir').addEventListener('click', () => {
 });
 $('buscarScript').addEventListener('input', pintarScripts);
 
-// ---- Exportar / importar los scripts (nombre, dirección y contraseña de cada uno) ----
-// El archivo lleva las contraseñas: se avisa antes. Sirve para pasarlos del ordenador al móvil, que no se sincronizan.
+// ---- Exportar / importar los scripts: solo nombre y dirección (las contraseñas nunca salen del dispositivo) ----
+// Sirve para pasar las direcciones del ordenador al móvil, que no se sincronizan; las contraseñas se ponen a mano.
 $('exportar').addEventListener('click', async () => {
-  const lista = scripts.map((s) => ({ nombre: s.nombre, tipo: s.tipo || '', direccion: dirs[s.id] || '', contrasena: claves[s.id] || '', id: s.id }));
-  if (!lista.some((x) => x.direccion || x.contrasena)) { avisar('Aún no hay direcciones ni contraseñas que exportar'); return; }
-  if (!confirm('El archivo incluye tus contraseñas en texto legible. Guárdalo en un sitio privado y bórralo cuando ya no lo necesites. ¿Exportar?')) return;
+  const lista = scripts.filter((s) => dirs[s.id]).map((s) => ({ nombre: s.nombre, tipo: s.tipo || '', direccion: dirs[s.id], id: s.id }));
+  if (!lista.length) { avisar('Aún no hay direcciones que exportar'); return; }
   const hoy = new Date().toISOString().slice(0, 10);
-  const datos = { app: 'Mis apps', tipo: 'scripts', version: 1, fecha: new Date().toISOString(), scripts: lista };
+  const datos = { app: 'Mis apps', tipo: 'scripts', version: 2, fecha: new Date().toISOString(), scripts: lista };
   const nombre = 'mis-scripts-' + hoy + '.json';
   const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
   // En el móvil, el menú de compartir (guardar en Archivos, AirDrop…); en el ordenador, descarga normal
@@ -442,7 +441,7 @@ $('exportar').addEventListener('click', async () => {
   a.href = URL.createObjectURL(blob); a.download = nombre;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-  avisar('Scripts exportados');
+  avisar(lista.length + ' scripts exportados (sin contraseñas)');
 });
 $('importar').addEventListener('click', () => $('archivoImportar').click());
 $('archivoImportar').addEventListener('change', async (e) => {
@@ -459,7 +458,6 @@ $('archivoImportar').addEventListener('change', async (e) => {
     if (!s) { s = { id: typeof x.id === 'string' && x.id ? x.id : 's' + Date.now().toString(36) + nuevos, nombre: x.nombre.slice(0, 60), tipo: x.tipo || 'Apps Script' }; scripts.push(s); nuevos++; }
     else actualizados++;
     if (typeof x.direccion === 'string' && /^https:\/\//.test(x.direccion.trim())) dirs[s.id] = x.direccion.trim();
-    if (typeof x.contrasena === 'string' && x.contrasena) claves[s.id] = x.contrasena;
   }
   guardarTodo(); pintarScripts();
   avisar('Importados: ' + actualizados + ' actualizados' + (nuevos ? ', ' + nuevos + ' nuevos' : ''));
