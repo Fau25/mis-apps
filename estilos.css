@@ -1,7 +1,6 @@
 /* Estilo «Aurora · Alba»: fondo claro con brumas lavanda, menta y melocotón; tarjetas de cristal blanco;
-   títulos en Instrument Serif y texto en Sora. Activo = píldora melocotón. (Las fuentes conservan los
-   nombres de archivo serif-400 / sans-*.) La capa Alba va al final y manda sobre lo anterior. */
-@font-face{font-family:Titular;font-weight:400;font-display:swap;src:url(fuentes/serif-400.woff2) format('woff2')}
+   todo en Sora (sin serif; la jerarquía va por pesos). Activo = píldora melocotón. (Las fuentes conservan los
+   nombres de archivo sans-*.) La capa Alba va al final y manda sobre lo anterior. */
 @font-face{font-family:Texto;font-weight:400;font-display:swap;src:url(fuentes/sans-400.woff2) format('woff2')}
 @font-face{font-family:Texto;font-weight:500;font-display:swap;src:url(fuentes/sans-500.woff2) format('woff2')}
 @font-face{font-family:Texto;font-weight:600;font-display:swap;src:url(fuentes/sans-600.woff2) format('woff2')}
@@ -10,7 +9,7 @@
   --tinta:#1A1A1F;--sec:#7A7B85;--suave:#EEEEF2;--linea:#ECECF0;--negro:#1A1A1F;
   --tarjeta:rgba(255,255,255,.88);--sombra:0 12px 32px rgba(40,42,60,.07),0 2px 6px rgba(40,42,60,.04);
   --rojo:#B42318;--foco:#6E7BF0;
-  --serif:Titular,Georgia,serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --serif:Texto,system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -253,4 +252,16 @@ h1,h2{letter-spacing:-.015em}
   .nb{background:transparent;color:#6E6680;font-family:Texto,system-ui,sans-serif;font-weight:600;font-size:14px}
   .nb.activo{background:var(--acento);color:var(--tinta)}
 }
+/* v15 · una sola letra: Sora en todo, jerarquía por peso y tamaño */
+h1,h2{font-weight:600;letter-spacing:-.035em}
+.cab h1{font-size:46px;line-height:1.08}
+.cab p,.cab small,#fecha{font-weight:400;letter-spacing:-.01em}
+.subcab h2{font-size:22px;font-weight:600;letter-spacing:-.02em}
+#nombre{font-size:30px;letter-spacing:-.03em}
+#tituloCajon{font-size:24px;letter-spacing:-.02em}
+.ficha b{font-weight:600;letter-spacing:-.02em}
+.ficha small{font-weight:400}
+.script .ini{font-weight:600;font-size:14px}
+.continuar b{font-weight:600;letter-spacing:-.02em}
+@media (max-width:700px){.cab h1{font-size:34px}.subcab h2{font-size:19px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
