@@ -264,4 +264,13 @@ h1,h2{font-weight:600;letter-spacing:-.035em}
 .script .ini{font-weight:600;font-size:14px}
 .continuar b{font-weight:600;letter-spacing:-.02em}
 @media (max-width:700px){.cab h1{font-size:34px}.subcab h2{font-size:19px}}
+/* v17 · copiar dirección y contraseña más a la vista */
+.linea .icob:not(.mas){width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.95);color:var(--tinta);box-shadow:0 2px 8px rgba(120,100,140,.10)}
+.linea .icob:not(.mas):hover:not(:disabled){background:#fff}
+.linea .icob:not(.mas):disabled{background:transparent;border-color:transparent;box-shadow:none;opacity:.35}
+.linea .icob.hecho{background:var(--acento)!important}
+.mini.sec{background:rgba(255,255,255,.85);color:var(--tinta);border:1px solid rgba(42,36,51,.1)}
+.mini.sec:hover:not(:disabled){background:#fff}
+.mini.hecho{background:#B5E9D8!important}
+.fila2 .mini{flex:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

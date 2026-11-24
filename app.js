@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v16';
+const VERSION = 'v17';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa
 const MAX_VIVAS = 5; // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -284,6 +284,14 @@ async function copiar(texto, boton, que) {
   setTimeout(() => { boton.replaceChild(svg, nuevo); boton.classList.remove('hecho'); }, 1400);
   avisar(que + ' copiada');
 }
+// Botón de texto «Copiar»: cambia a «Copiada» un momento
+async function copiarTexto(texto, boton, que) {
+  if (!texto) return;
+  try { await navigator.clipboard.writeText(texto); } catch (e) { avisar('No se pudo copiar'); return; }
+  const antes = boton.textContent; boton.textContent = 'Copiada'; boton.classList.add('hecho');
+  setTimeout(() => { boton.textContent = antes; boton.classList.remove('hecho'); }, 1400);
+  avisar(que + ' copiada');
+}
 function botonIcono(d, etiqueta, cls) {
   const b = el('button', 'icob' + (cls ? ' ' + cls : ''));
   b.type = 'button';
@@ -346,11 +354,13 @@ function detalle(s, refs) {
   iU.type = 'url'; iU.spellcheck = false; iU.value = dirs[s.id] || '';
   iU.placeholder = 'https://script.google.com/macros/s/…/exec';
   const bAbrir = el('button', 'mini', 'Abrir'); bAbrir.type = 'button';
+  const bCopU = el('button', 'mini sec', 'Copiar'); bCopU.type = 'button'; bCopU.setAttribute('aria-label', 'Copiar la dirección de ' + s.nombre);
+  bCopU.addEventListener('click', () => copiarTexto(dirs[s.id], bCopU, 'Dirección'));
   const aviso = el('span', 'avisoCampo'); aviso.setAttribute('role', 'status');
-  const refrescarU = () => { const v = iU.value.trim(); aviso.textContent = avisoDe(s, v); bAbrir.disabled = refs.bUrl.disabled = !v; };
+  const refrescarU = () => { const v = iU.value.trim(); aviso.textContent = avisoDe(s, v); bAbrir.disabled = bCopU.disabled = refs.bUrl.disabled = !v; };
   iU.addEventListener('input', () => { const v = iU.value.trim(); if (v) dirs[s.id] = v; else delete dirs[s.id]; guardarTodo(); refrescarU(); });
   bAbrir.addEventListener('click', () => { if (dirs[s.id]) window.open(dirs[s.id], '_blank', 'noopener'); });
-  f1.append(iU, bAbrir);
+  f1.append(iU, bCopU, bAbrir);
   cU.append(f1, aviso);
   refrescarU();
   // Contraseña (oculta salvo que pulses «Ver»; se vuelve a ocultar sola)
@@ -359,8 +369,10 @@ function detalle(s, refs) {
   const iP = el('input');
   iP.type = 'password'; iP.autocomplete = 'off'; iP.spellcheck = false; iP.value = claves[s.id] || ''; iP.placeholder = 'Contraseña';
   const bVer = el('button', 'mini', 'Ver'); bVer.type = 'button';
+  const bCopP = el('button', 'mini sec', 'Copiar'); bCopP.type = 'button'; bCopP.setAttribute('aria-label', 'Copiar la contraseña de ' + s.nombre);
+  bCopP.addEventListener('click', () => copiarTexto(claves[s.id], bCopP, 'Contraseña'));
   let t = null;
-  const refrescarP = () => { bVer.disabled = refs.bPass.disabled = !iP.value; };
+  const refrescarP = () => { bVer.disabled = bCopP.disabled = refs.bPass.disabled = !iP.value; };
   iP.addEventListener('input', () => { if (iP.value) claves[s.id] = iP.value; else delete claves[s.id]; guardarTodo(); refrescarP(); });
   bVer.addEventListener('click', () => {
     const oculta = iP.type === 'password';
@@ -368,7 +380,7 @@ function detalle(s, refs) {
     clearTimeout(t);
     if (oculta) t = setTimeout(() => { iP.type = 'password'; bVer.textContent = 'Ver'; }, 10000);
   });
-  f2.append(iP, bVer);
+  f2.append(iP, bCopP, bVer);
   cP.appendChild(f2);
   refrescarP();
   // Eliminar (con deshacer)
