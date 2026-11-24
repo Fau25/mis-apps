@@ -286,4 +286,8 @@ h1,h2{font-weight:600;letter-spacing:-.035em}
   #vistaApp #recargar{width:40px;height:40px}
   #marco{margin:0;border-radius:0;border:0;box-shadow:none;padding-bottom:0}
 }
+.pieDos{display:flex;gap:8px;margin-bottom:8px}
+.pieDos .pildora{flex:1;height:44px}
+.pildora.sec{background:rgba(255,255,255,.75);color:var(--tinta);border:1px solid rgba(42,36,51,.1)}
+.pildora.sec:hover{background:#fff}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

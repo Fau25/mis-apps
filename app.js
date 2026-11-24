@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v18';
+const VERSION = 'v19';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -422,6 +422,48 @@ $('anadir').addEventListener('click', () => {
   if (i) { i.focus(); i.select(); i.scrollIntoView({ block: 'nearest' }); }
 });
 $('buscarScript').addEventListener('input', pintarScripts);
+
+// ---- Exportar / importar los scripts (nombre, dirección y contraseña de cada uno) ----
+// El archivo lleva las contraseñas: se avisa antes. Sirve para pasarlos del ordenador al móvil, que no se sincronizan.
+$('exportar').addEventListener('click', async () => {
+  const lista = scripts.map((s) => ({ nombre: s.nombre, tipo: s.tipo || '', direccion: dirs[s.id] || '', contrasena: claves[s.id] || '', id: s.id }));
+  if (!lista.some((x) => x.direccion || x.contrasena)) { avisar('Aún no hay direcciones ni contraseñas que exportar'); return; }
+  if (!confirm('El archivo incluye tus contraseñas en texto legible. Guárdalo en un sitio privado y bórralo cuando ya no lo necesites. ¿Exportar?')) return;
+  const hoy = new Date().toISOString().slice(0, 10);
+  const datos = { app: 'Mis apps', tipo: 'scripts', version: 1, fecha: new Date().toISOString(), scripts: lista };
+  const nombre = 'mis-scripts-' + hoy + '.json';
+  const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+  // En el móvil, el menú de compartir (guardar en Archivos, AirDrop…); en el ordenador, descarga normal
+  try {
+    const f = new File([blob], nombre, { type: 'application/json' });
+    if (MOVIL.matches && navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Mis scripts' }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  avisar('Scripts exportados');
+});
+$('importar').addEventListener('click', () => $('archivoImportar').click());
+$('archivoImportar').addEventListener('change', async (e) => {
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  let d; try { d = JSON.parse(await f.text()); } catch (err) { avisar('Ese archivo no es una copia de scripts'); return; }
+  const lista = d && Array.isArray(d.scripts) ? d.scripts : null;
+  if (!lista) { avisar('Ese archivo no es una copia de scripts'); return; }
+  let nuevos = 0, actualizados = 0;
+  for (const x of lista) {
+    if (!x || typeof x.nombre !== 'string') continue;
+    // Se empareja por id y, si no, por nombre; si no existe, se añade
+    let s = scripts.find((y) => y.id === x.id) || scripts.find((y) => y.nombre.trim().toLowerCase() === x.nombre.trim().toLowerCase());
+    if (!s) { s = { id: typeof x.id === 'string' && x.id ? x.id : 's' + Date.now().toString(36) + nuevos, nombre: x.nombre.slice(0, 60), tipo: x.tipo || 'Apps Script' }; scripts.push(s); nuevos++; }
+    else actualizados++;
+    if (typeof x.direccion === 'string' && /^https:\/\//.test(x.direccion.trim())) dirs[s.id] = x.direccion.trim();
+    if (typeof x.contrasena === 'string' && x.contrasena) claves[s.id] = x.contrasena;
+  }
+  guardarTodo(); pintarScripts();
+  avisar('Importados: ' + actualizados + ' actualizados' + (nuevos ? ', ' + nuevos + ' nuevos' : ''));
+});
 
 function abrirCajon() {
   ultimoFoco = document.activeElement;
