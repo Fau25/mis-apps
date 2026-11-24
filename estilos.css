@@ -112,7 +112,17 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:var(--suave);border-ra
 #volverApp{display:none}
 #marco{flex:1;position:relative;margin:0 16px 16px 16px;border-radius:30px;overflow:hidden;background:#fff;border:var(--borde);box-shadow:var(--sombra)}
 #marco iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
-#cargando{position:absolute;inset:0;margin:0;display:flex;align-items:center;justify-content:center;color:var(--sec);font-size:14px}
+#cargando{position:absolute;inset:0;margin:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;color:var(--sec);font-size:14px;font-weight:500;background:var(--fondoApp,#fff);z-index:1}
+#cargando[hidden]{display:none}
+#cargando .tile{width:64px;height:64px;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--tinta);animation:latir 1.4s ease-in-out infinite;box-shadow:0 10px 30px rgba(120,100,140,.14)}
+#cargando .tile svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#cargando.oscuro{color:#ABA4B8}
+@keyframes latir{50%{transform:scale(.94);opacity:.8}}
+#cambiarApp{display:none}
+#volverApp span{display:none}
+#hojaApps{display:none}
+.ficha .marca.viva{display:flex}
+.ficha small.vivo{color:var(--tinta);font-weight:500}
 
 /* ---- Panel de Scripts ---- */
 #velo{position:fixed;inset:0;background:rgba(90,76,110,.18);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:20;animation:aparece .18s}
@@ -197,16 +207,18 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:var(--suave);border-ra
   .ficha b{font-size:15.5px}
   .ficha small{font-size:11.5px;margin-top:1px;-webkit-line-clamp:1}
   .ficha .flecha{display:none}
-  .continuar{display:none}
+  .ficha .marca.viva{display:none}
+  .continuar{grid-column:1/-1;padding:14px 14px 14px 16px;gap:12px;border-radius:24px}
+  .continuar small{display:none}
+  .continuar .ico{width:40px;height:40px;border-radius:14px}
   kbd{display:none}
   #navMovil{display:flex;position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:15;
     gap:6px;padding:6px;border-radius:999px;background:rgba(255,255,255,.72);border:var(--borde);
     backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 10px 30px rgba(120,100,140,.14)}
-  .nb{height:50px;min-width:50px;border-radius:999px;border:none;background:transparent;color:#6E6680;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 15px;
-    font-family:Texto,system-ui,sans-serif;font-weight:600;font-size:14px}
-  .nb span{display:none}
-  .nb.activo{background:var(--acento);color:var(--tinta);padding:0 20px}
-  .nb.activo span{display:inline}
+  .nb{height:52px;min-width:76px;border-radius:999px;border:none;background:transparent;color:#6E6680;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 16px;
+    font-family:Texto,system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.01em}
+  .nb svg{width:20px;height:20px}
+  .nb.activo{background:var(--acento);color:var(--tinta)}
   #cajon{top:10px;right:10px;bottom:10px;left:10px;width:auto;max-width:none;border-radius:30px}
   .script .linea{height:60px}
   .icob{width:40px;height:40px}
@@ -214,14 +226,31 @@ kbd{font:600 11px var(--mono);color:var(--sec);background:var(--suave);border-ra
      (dentro de un iframe la app no recibe la zona segura del iPhone) */
   body.con-app #navMovil{display:none}
   #vistaApp{position:fixed;inset:0;z-index:20;background:#F3EEF1}
-  #vistaApp .barraApp{height:auto;min-height:52px;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;gap:10px;background:var(--barraApp,#F3EEF1);transition:background .2s}
-  #volverApp{display:flex;width:40px;height:40px;flex:none}
-  #volverApp svg{width:20px;height:20px}
-  #vistaApp .barraApp h1{font-size:18px;letter-spacing:-.02em}
-  #vistaApp #dir,#vistaApp #aparte{display:none}
-  #vistaApp #recargar{width:40px;height:40px}
-  #vistaApp.appOscura .barraApp h1{color:#F6F0EC}
-  #vistaApp.appOscura .barraApp .redondo{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#F6F0EC}
+  #vistaApp .barraApp{height:auto;min-height:48px;padding:calc(2px + env(safe-area-inset-top)) 8px 2px 4px;gap:4px;justify-content:space-between;background:var(--barraApp,#F3EEF1);transition:background .2s}
+  #vistaApp .barraApp .titulo,#vistaApp #dir,#vistaApp #aparte,#vistaApp #recargar{display:none}
+  #volverApp{display:flex;align-items:center;gap:2px;height:44px;padding:0 12px 0 6px;border:0;border-radius:999px;background:transparent;color:var(--tinta);
+    font-family:Texto,system-ui,sans-serif;font-weight:600;font-size:15px;letter-spacing:-.01em;cursor:pointer;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+  #volverApp span{display:inline}
+  #volverApp svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  #volverApp:active{background:rgba(42,36,51,.08)}
+  #cambiarApp{display:flex;width:44px;height:44px;background:transparent;border-color:transparent;box-shadow:none}
+  #cambiarApp svg{width:19px;height:19px}
+  #vistaApp.appOscura #volverApp,#vistaApp.appOscura #cambiarApp{color:#F6F0EC}
+  #vistaApp.appOscura #volverApp:active{background:rgba(255,255,255,.12)}
+  #hojaApps{display:block;position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:40;padding:8px 14px 14px;border-radius:30px;
+    background:rgba(255,255,255,.92);border:var(--borde);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 20px 50px rgba(60,40,80,.25);animation:subir .22s ease-out}
+  #hojaApps[hidden]{display:none}
+  #hojaApps .asa{width:40px;height:5px;border-radius:3px;background:rgba(42,36,51,.18);margin:2px auto 12px}
+  .hojaLista{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 4px}
+  .hojaApp{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:84px;padding:8px 2px;border:0;border-radius:20px;background:transparent;color:var(--tinta);
+    font-family:Texto,system-ui,sans-serif;font-weight:500;font-size:11.5px;line-height:1.15;text-align:center;cursor:pointer}
+  .hojaApp .tile{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+  .hojaApp .tile svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .hojaApp[aria-current]{background:rgba(255,203,179,.45);font-weight:600}
+  .hojaPie{display:flex;gap:8px;margin-top:12px}
+  .hojaPie .pildora{flex:1;height:48px}
+  #velo.deHoja{z-index:35}
+  @keyframes subir{from{transform:translateY(30px);opacity:0}}
   #marco{margin:0;border-radius:0;border:0;box-shadow:none;padding-bottom:0;background:var(--fondoApp,#F3EEF1)}
   #marco iframe{top:0;bottom:auto;height:calc(100% - max(env(safe-area-inset-bottom),6px));background:var(--fondoApp,#fff)}
 }

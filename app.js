@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v25';
+const VERSION = 'v26';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -85,7 +85,7 @@ APPS.forEach((a, i) => {
 conGlobo($('logo'), 'Inicio  ·  Alt+0');
 conGlobo($('btnScripts'), 'Scripts y contraseñas');
 $('logo').addEventListener('click', mostrarInicio);
-$('volverApp').addEventListener('click', mostrarInicio);
+$('volverApp').addEventListener('click', () => { if (largo) { largo = false; return; } mostrarInicio(); });
 addEventListener('popstate', () => { if (actual) { actualEnHistorial = false; mostrarInicio(); } });
 
 // ---- Inicio ----
@@ -112,10 +112,13 @@ function pintarInicio() {
     tile.appendChild(icono(a.d));
     const marca = el('span', 'marca');
     if (a.ext) marca.textContent = 'Aparte ↗';
-    else if (vivas.has(a.id)) { marca.appendChild(el('i')); marca.append('Abierta'); }
+    else if (vivas.has(a.id)) { marca.appendChild(el('i')); marca.append('Abierta'); marca.classList.add('viva'); }
     arriba.append(tile, marca);
     const txt = el('span');
-    txt.append(el('b', '', a.nombre), el('small', '', a.desc));
+    const sub = el('small', '', a.desc);
+    sub.dataset.vivo = a.id;
+    if (vivo[a.id]) { sub.textContent = vivo[a.id]; sub.classList.add('vivo'); }
+    txt.append(el('b', '', a.nombre), sub);
     const flecha = el('span', 'flecha'); flecha.appendChild(icono(IC.flecha));
     f.append(arriba, txt, flecha);
     f.addEventListener('click', () => abrir(a.id));
@@ -136,6 +139,7 @@ function pintarInicio() {
     r.appendChild(c);
   }
   $('sinResultados').hidden = visibles.length > 0;
+  leerVivos();
   $('cuenta').textContent = APPS.length + ' apps' + (vivas.size ? ' · ' + vivas.size + ' abiertas' : '');
 }
 $('buscar').addEventListener('input', pintarInicio);
@@ -144,10 +148,115 @@ $('buscar').addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { $('buscar').value = ''; pintarInicio(); $('buscar').blur(); }
 });
 
+// ---- Dato vivo de cada ficha: lo que cada app guarda en este dispositivo (misma dirección, solo lectura) ----
+const vivo = {};
+const hoyISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const diasA = (iso) => Math.round((new Date(String(iso).slice(0, 10) + 'T12:00') - new Date(hoyISO() + 'T12:00')) / 864e5);
+const enDias = (n) => (n === 0 ? 'hoy' : n === 1 ? 'mañana' : 'en ' + n + ' días');
+const plural = (n, uno, varios) => n + ' ' + (n === 1 ? uno : varios);
+// Abre una base de IndexedDB de otra app SOLO si ya existe (si no, se cancela para no crearla vacía)
+async function leerIDB(nombre, almacen, clave) {
+  if (!window.indexedDB || !indexedDB.databases) return null;
+  try {
+    const hay = (await indexedDB.databases()).some((d) => d.name === nombre);
+    if (!hay) return null;
+    return await new Promise((ok) => {
+      const r = indexedDB.open(nombre);
+      r.onupgradeneeded = () => { try { r.transaction.abort(); } catch (e) {} };
+      r.onerror = () => ok(null);
+      r.onsuccess = () => {
+        const db = r.result;
+        try {
+          if (!db.objectStoreNames.contains(almacen)) { db.close(); return ok(null); }
+          const st = db.transaction(almacen, 'readonly').objectStore(almacen);
+          const q = clave == null ? st.getAll() : st.get(clave);
+          q.onsuccess = () => { db.close(); ok(q.result); };
+          q.onerror = () => { db.close(); ok(null); };
+        } catch (e) { db.close(); ok(null); }
+      };
+    });
+  } catch (e) { return null; }
+}
+const VIVO = {
+  dia() {
+    const d = leerJSON('midia-v1', null);
+    if (!d || !Array.isArray(d.tasks)) return null;
+    const h = hoyISO();
+    const t = d.tasks.filter((x) => !x.done && x.d && x.d <= h).length;
+    const ev = (d.events || []).filter((e) => e.d === h).length;
+    if (!t && !ev) return 'Nada pendiente hoy';
+    return [t && plural(t, 'tarea', 'tareas'), ev && plural(ev, 'evento', 'eventos')].filter(Boolean).join(' · ') + ' hoy';
+  },
+  habitos() {
+    const d = leerJSON('habitos-v1', null);
+    if (!d || !Array.isArray(d.habitos) || !d.habitos.length) return null;
+    const h = hoyISO(), dia = new Date().getDay();
+    const toca = d.habitos.filter((x) => (!x.creado || x.creado <= h) && (x.frecuencia === 'diario' || (x.dias || []).includes(dia)));
+    if (!toca.length) return 'Hoy no toca ninguno';
+    const n = toca.filter((x) => x.hechos && x.hechos[h]).length;
+    return n === toca.length ? 'Todo hecho hoy' : n + ' de ' + toca.length + ' hechos hoy';
+  },
+  compra() {
+    const d = leerJSON('mc-datos', null);
+    if (!d || !d.items) return null;
+    const n = Object.values(d.items).filter((i) => i && !i.x && !i.h).length;
+    return n ? plural(n, 'cosa por comprar', 'cosas por comprar') : 'Lista vacía';
+  },
+  mascota() {
+    const d = leerJSON('mm-datos', null);
+    if (!d || !Array.isArray(d.salud)) return null;
+    const L = d.salud, norm = (s) => String(s || '').toLowerCase().trim();
+    const p = L.filter((s) => s.proxima && !L.some((o) => o.id !== s.id && norm(o.nombre) === norm(s.nombre) && (o.fecha || '') > (s.fecha || '')))
+      .map((s) => ({ n: s.nombre || 'Revisión', d: diasA(s.proxima) })).filter((x) => x.d >= -60).sort((a, b) => a.d - b.d)[0];
+    if (!p) return null;
+    return p.d < 0 ? p.n + ': pendiente' : p.n + ' ' + enDias(p.d);
+  },
+  async viajes() {
+    const L = await leerIDB('mis-viajes', 'viajes');
+    if (!Array.isArray(L) || !L.length) return null;
+    const h = hoyISO();
+    const ya = L.find((v) => v.inicio && v.inicio <= h && (v.fin || v.inicio) >= h);
+    if (ya) return 'De viaje: ' + (ya.titulo || ya.destino || 'hoy');
+    const p = L.filter((v) => v.inicio && v.inicio > h).sort((a, b) => a.inicio.localeCompare(b.inicio))[0];
+    return p ? (p.titulo || p.destino || 'Viaje') + ' ' + enDias(diasA(p.inicio)) : plural(L.length, 'viaje guardado', 'viajes guardados');
+  },
+  async tickets() {
+    let L = await leerIDB('mis-tickets', 'datos', 'tickets');
+    if (!Array.isArray(L)) L = leerJSON('mt-tickets', null);
+    if (!Array.isArray(L)) return null;
+    L = L.filter((t) => t && !t.borrado);
+    if (!L.length) return null;
+    const p = L.filter((t) => t.devHasta && diasA(t.devHasta) >= 0).sort((a, b) => diasA(a.devHasta) - diasA(b.devHasta))[0];
+    return p ? 'Devolución ' + enDias(diasA(p.devHasta)) + (p.tienda ? ' · ' + p.tienda : '') : plural(L.length, 'ticket guardado', 'tickets guardados');
+  },
+  pedidos() {
+    const d = leerJSON('mp-datos', null);
+    if (!d || !Array.isArray(d.pedidos)) return null;
+    const n = d.pedidos.filter((p) => !p.archivado && p.estado !== 'delivered').length;
+    return n ? plural(n, 'pedido en camino', 'pedidos en camino') : 'Sin envíos pendientes';
+  }
+};
+let leyendoVivos = false;
+async function leerVivos() {
+  if (leyendoVivos) return;
+  leyendoVivos = true;
+  for (const a of APPS) {
+    if (!VIVO[a.id]) continue;
+    let t = null;
+    try { t = await VIVO[a.id](); } catch (e) {}
+    vivo[a.id] = t || '';
+    const s = document.querySelector('small[data-vivo="' + a.id + '"]');
+    if (s) { s.textContent = t || a.desc; s.classList.toggle('vivo', !!t); }
+  }
+  leyendoVivos = false;
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('inicio').hidden) leerVivos(); });
+
 let actualEnHistorial = false;
 function mostrarInicio() {
   if (actualEnHistorial) { actualEnHistorial = false; history.back(); return; }   // popstate vuelve a llamar aquí
   actual = null;
+  cerrarHoja();
   document.body.classList.remove('con-app');
   ponerTema(COLOR_PANEL);
   $('vistaApp').hidden = true;
@@ -161,7 +270,7 @@ function mostrarInicio() {
 }
 
 // ---- Color de fondo de cada app (su theme-color): pinta el hueco de abajo en el móvil ----
-const coloresApp = {};
+const coloresApp = leerJSON('mis-apps-colores', {});
 const COLOR_PANEL = '#F3EEF1';
 function esOscuro(color) {
   const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(color) || [];
@@ -183,6 +292,7 @@ function vigilarColor(f, id) {
     const doc = f.contentDocument, leerColor = () => {
       const m = doc.querySelector('meta[name="theme-color"]:not([media])') || doc.querySelector('meta[name="theme-color"]');
       coloresApp[id] = (m && m.content) || getComputedStyle(doc.body).backgroundColor || '';
+      guardar('mis-apps-colores', JSON.stringify(coloresApp));
       if (actual && actual.id === id) ponerFondoApp();
     };
     leerColor();
@@ -220,7 +330,7 @@ function abrir(id) {
     f.title = a.nombre;
     f.setAttribute('allow', 'clipboard-read; clipboard-write; camera; microphone; fullscreen; web-share; geolocation');
     f.src = a.ruta;
-    cargando.hidden = false;
+    verCargando(a);
     f.addEventListener('load', () => {
       f.dataset.cargada = '1';
       vigilarColor(f, id);
@@ -245,14 +355,59 @@ function abrir(id) {
   try { f.focus(); } catch (e) {}
 }
 
-$('recargar').addEventListener('click', () => {
+function recargar() {
   if (!actual) return;
   const f = vivas.get(actual.id);
   if (!f) return;
-  cargando.hidden = false;
+  verCargando(actual);
   try { f.contentWindow.location.reload(); } catch (e) { f.src = actual.ruta; }
   f.addEventListener('load', () => { cargando.hidden = true; }, { once: true });
-});
+}
+$('recargar').addEventListener('click', recargar);
+
+// Pantalla de carga con el color, el icono y el nombre de la app (no un «Cargando…» suelto)
+function verCargando(a) {
+  const ico = $('cargandoIco');
+  ico.textContent = '';
+  ico.appendChild(icono(a.d));
+  ico.style.background = ['var(--g1)', 'var(--g2)', 'var(--g3)'][APPS.indexOf(a) % 3];
+  $('cargandoTxt').textContent = 'Abriendo ' + a.nombre + '…';
+  cargando.classList.toggle('oscuro', esOscuro(coloresApp[a.id] || COLOR_PANEL));
+  cargando.hidden = false;
+}
+
+// ---- Hoja para cambiar de app sin pasar por el Inicio (móvil): botón ▦ o mantener pulsado «‹ Mis apps» ----
+function abrirHoja() {
+  const l = $('hojaLista');
+  l.textContent = '';
+  APPS.forEach((a, i) => {
+    const b = el('button', 'hojaApp');
+    b.type = 'button';
+    const t = el('span', 'tile'); t.appendChild(icono(a.d));
+    t.style.background = ['var(--g1)', 'var(--g2)', 'var(--g3)'][i % 3];
+    b.append(t, el('span', '', a.nombre));
+    if (actual && actual.id === a.id) b.setAttribute('aria-current', 'true');
+    b.addEventListener('click', () => { cerrarHoja(); if (!actual || actual.id !== a.id) abrir(a.id); });
+    l.appendChild(b);
+  });
+  $('velo').hidden = $('hojaApps').hidden = false;
+  $('velo').classList.add('deHoja');
+  const c = l.querySelector('[aria-current]') || l.firstChild;
+  if (c) c.focus();
+}
+function cerrarHoja() {
+  if ($('hojaApps').hidden) return;
+  $('hojaApps').hidden = true;
+  $('velo').classList.remove('deHoja');
+  if ($('cajon').hidden) $('velo').hidden = true;
+}
+$('cambiarApp').addEventListener('click', abrirHoja);
+$('hojaRecargar').addEventListener('click', () => { cerrarHoja(); recargar(); });
+$('hojaInicio').addEventListener('click', () => { cerrarHoja(); mostrarInicio(); });
+let pulsado = null, largo = false;
+$('volverApp').addEventListener('pointerdown', () => { largo = false; pulsado = setTimeout(() => { largo = true; if (navigator.vibrate) navigator.vibrate(10); abrirHoja(); }, 500); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => $('volverApp').addEventListener(ev, () => clearTimeout(pulsado)));
+$('volverApp').addEventListener('contextmenu', (e) => e.preventDefault());
 $('aparte').addEventListener('click', () => { if (actual) window.open(actual.ruta, '_blank', 'noopener'); });
 
 // ---- Scripts: lista editable; direcciones y contraseñas solo en este ordenador ----
@@ -508,24 +663,24 @@ function cerrarCajon(devolverFoco = true) {
   if ($('cajon').hidden) return;
   $('velo').hidden = $('cajon').hidden = true;
   $('btnScripts').setAttribute('aria-expanded', 'false');
-  navActivo($('buscar').closest('.buscar').classList.contains('ver') ? 'nBuscar' : 'nInicio');
+  navActivo('nInicio');
   if (devolverFoco && ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
 }
 $('btnScripts').addEventListener('click', () => ($('cajon').hidden ? abrirCajon() : cerrarCajon()));
 $('abrirScripts').addEventListener('click', abrirCajon);
 $('cerrarCajon').addEventListener('click', () => cerrarCajon());
-$('velo').addEventListener('click', () => cerrarCajon());
+$('velo').addEventListener('click', () => { if (!$('hojaApps').hidden) cerrarHoja(); else cerrarCajon(); });
 
 // ---- Menú inferior (móvil) ----
 function navActivo(id) {
-  ['nInicio', 'nBuscar', 'nScripts'].forEach((k) => $(k).classList.toggle('activo', k === id));
+  ['nInicio', 'nScripts'].forEach((k) => $(k).classList.toggle('activo', k === id));
 }
 $('nInicio').addEventListener('click', () => { cerrarCajon(false); $('buscar').closest('.buscar').classList.remove('ver'); $('buscar').value = ''; pintarInicio(); navActivo('nInicio'); $('inicio').scrollTo({ top: 0, behavior: 'smooth' }); });
-$('nBuscar').addEventListener('click', () => { cerrarCajon(false); const l = $('buscar').closest('.buscar'); l.classList.add('ver'); navActivo('nBuscar'); $('buscar').focus(); });
 $('nScripts').addEventListener('click', () => { abrirCajon(); navActivo('nScripts'); });
 
 // ---- Teclado ----
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('hojaApps').hidden) { e.preventDefault(); cerrarHoja(); $('cambiarApp').focus(); return; }
   if (e.key === 'Escape' && !$('cajon').hidden) { e.preventDefault(); cerrarCajon(); return; }
   if (e.key === 'Tab' && !$('cajon').hidden) { // el foco no sale del panel lateral
     const f = [...$('cajon').querySelectorAll('button:not(:disabled),input')];

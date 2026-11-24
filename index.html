@@ -55,8 +55,8 @@
 
   <section id="vistaApp" hidden>
     <header class="barraApp">
-      <button id="volverApp" class="redondo" type="button" aria-label="Volver a mis apps" title="Volver">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <button id="volverApp" type="button" aria-label="Volver a Mis apps (mantén pulsado para cambiar de app)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Mis apps</span>
       </button>
       <div class="titulo">
         <h1 id="nombre"></h1>
@@ -68,20 +68,30 @@
       <button id="aparte" class="redondo grande" type="button" aria-label="Abrir en otra pestaña" title="Abrir en otra pestaña">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></svg>
       </button>
+      <button id="cambiarApp" class="redondo" type="button" aria-label="Cambiar de app" aria-haspopup="dialog" aria-controls="hojaApps">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+      </button>
     </header>
     <div id="marco">
-      <p id="cargando" hidden>Cargando…</p>
+      <div id="cargando" hidden><span id="cargandoIco" class="tile"></span><span id="cargandoTxt">Cargando…</span></div>
     </div>
   </section>
 </main>
 
 <nav id="navMovil" aria-label="Menú">
   <button id="nInicio" class="nb activo" type="button" aria-label="Inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><span>Inicio</span></button>
-  <button id="nBuscar" class="nb" type="button" aria-label="Buscar app"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></svg><span>Buscar</span></button>
   <button id="nScripts" class="nb" type="button" aria-label="Scripts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Scripts</span></button>
 </nav>
 
 <div id="velo" hidden></div>
+<div id="hojaApps" role="dialog" aria-modal="true" aria-label="Cambiar de app" hidden>
+  <div class="asa" aria-hidden="true"></div>
+  <div id="hojaLista" class="hojaLista"></div>
+  <div class="hojaPie">
+    <button id="hojaRecargar" class="pildora sec" type="button">Recargar esta app</button>
+    <button id="hojaInicio" class="pildora oscura" type="button">Ir a Mis apps</button>
+  </div>
+</div>
 <div id="cajon" role="dialog" aria-modal="true" aria-labelledby="tituloCajon" hidden>
   <header class="cabCajon">
     <div class="titulo">
