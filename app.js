@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v24';
+const VERSION = 'v25';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -149,6 +149,7 @@ function mostrarInicio() {
   if (actualEnHistorial) { actualEnHistorial = false; history.back(); return; }   // popstate vuelve a llamar aquí
   actual = null;
   document.body.classList.remove('con-app');
+  ponerTema(COLOR_PANEL);
   $('vistaApp').hidden = true;
   $('inicio').hidden = false;
   for (const b of Object.values(botones)) b.removeAttribute('aria-current');
@@ -161,7 +162,22 @@ function mostrarInicio() {
 
 // ---- Color de fondo de cada app (su theme-color): pinta el hueco de abajo en el móvil ----
 const coloresApp = {};
-function ponerFondoApp() { const c = actual && coloresApp[actual.id]; marco.style.setProperty('--fondoApp', c || '#F3EEF1'); }
+const COLOR_PANEL = '#F3EEF1';
+function esOscuro(color) {
+  const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(color) || [];
+  if (!m.length) { const h = /^#?([0-9a-f]{6})$/i.exec(color); if (!h) return false; const n = parseInt(h[1], 16); m.push(0, n >> 16, (n >> 8) & 255, n & 255); }
+  return (0.299 * m[1] + 0.587 * m[2] + 0.114 * m[3]) < 140;
+}
+function ponerTema(c) { const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = c; }
+function ponerFondoApp() {
+  const c = (actual && coloresApp[actual.id]) || COLOR_PANEL;
+  marco.style.setProperty('--fondoApp', c);
+  // En el móvil la barra de arriba (y la del sistema) toma el color de la app: sin salto de claro a oscuro
+  const v = $('vistaApp');
+  v.style.setProperty('--barraApp', c);
+  v.classList.toggle('appOscura', esOscuro(c));
+  if (actual && MOVIL.matches) ponerTema(c);
+}
 function vigilarColor(f, id) {
   try {
     const doc = f.contentDocument, leerColor = () => {
@@ -383,6 +399,8 @@ function detalle(s, refs) {
   const refrescarU = () => { const v = iU.value.trim(); aviso.textContent = avisoDe(s, v); bAbrir.disabled = bCopU.disabled = refs.bUrl.disabled = !v; };
   iU.addEventListener('input', () => { const v = iU.value.trim(); if (v) dirs[s.id] = v; else delete dirs[s.id]; guardarTodo(); refrescarU(); });
   bAbrir.addEventListener('click', () => { if (dirs[s.id]) window.open(dirs[s.id], '_blank', 'noopener'); });
+  bAbrir.title = 'Abre el script en el navegador para comprobar que responde';
+  if (MOVIL.matches) bAbrir.hidden = true;
   f1.append(iU, bCopU, bAbrir);
   cU.append(f1, aviso);
   refrescarU();
@@ -534,6 +552,12 @@ else {
   mostrarInicio();
   if (inicial === 'scripts' || inicial === 'direcciones') abrirCajon();
 }
+// Si cambia #… con el panel ya abierto (un enlace o un acceso directo), también se obedece
+addEventListener('hashchange', () => {
+  const h = location.hash.slice(1);
+  if (APPS.some((a) => a.id === h && !a.ext)) { if (!actual || actual.id !== h) abrir(h); }
+  else if (h === 'scripts' || h === 'direcciones') abrirCajon();
+});
 $('logo').title = '';
 $('logo').dataset.version = VERSION;
 

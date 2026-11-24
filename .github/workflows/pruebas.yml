@@ -1,0 +1,23 @@
+name: Pruebas del panel
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  pruebas:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: mis-apps
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar Playwright
+        run: pip install playwright && python -m playwright install --with-deps chromium
+      - name: Servir y probar
+        run: |
+          python -m http.server 8766 >/dev/null 2>&1 &
+          sleep 1
+          python mis-apps/tests/test_panel.py
