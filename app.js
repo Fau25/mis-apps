@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v22';
+const VERSION = 'v23';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -160,6 +160,21 @@ function mostrarInicio() {
   pintarInicio();
 }
 
+// ---- Color de fondo de cada app (su theme-color): pinta el hueco de abajo en el móvil ----
+const coloresApp = {};
+function ponerFondoApp() { const c = actual && coloresApp[actual.id]; marco.style.setProperty('--fondoApp', c || '#F3EEF1'); }
+function vigilarColor(f, id) {
+  try {
+    const doc = f.contentDocument, leerColor = () => {
+      const m = doc.querySelector('meta[name="theme-color"]:not([media])') || doc.querySelector('meta[name="theme-color"]');
+      coloresApp[id] = (m && m.content) || getComputedStyle(doc.body).backgroundColor || '';
+      if (actual && actual.id === id) ponerFondoApp();
+    };
+    leerColor();
+    new MutationObserver(leerColor).observe(doc.head, { subtree: true, attributes: true, attributeFilter: ['content'] });   // Mi Día lo cambia según la pestaña
+  } catch (e) {}
+}
+
 // ---- Abrir una app ----
 function abrir(id) {
   const a = APPS.find((x) => x.id === id);
@@ -193,6 +208,7 @@ function abrir(id) {
     cargando.hidden = false;
     f.addEventListener('load', () => {
       f.dataset.cargada = '1';
+      vigilarColor(f, id);
       if (actual && actual.id === id) cargando.hidden = true;
       try { f.contentWindow.document.addEventListener('keydown', atajosApps); } catch (e) {} // misma dirección: Alt+0…9 también dentro de la app
     });
@@ -200,6 +216,7 @@ function abrir(id) {
   }
   vivas.set(id, f);
   vivas.forEach((fr, k) => { fr.hidden = k !== id; });
+  ponerFondoApp();
   if (f.dataset.cargada) cargando.hidden = true;
 
   // Libera las que llevan más tiempo sin usarse

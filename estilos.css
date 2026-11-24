@@ -284,7 +284,10 @@ h1,h2{font-weight:600;letter-spacing:-.035em}
   #vistaApp .barraApp h1{font-size:18px;letter-spacing:-.02em}
   #vistaApp #dir,#vistaApp #aparte{display:none}
   #vistaApp #recargar{width:40px;height:40px}
-  #marco{margin:0;border-radius:0;border:0;box-shadow:none;padding-bottom:0}
+  #marco{margin:0;border-radius:0;border:0;box-shadow:none;padding-bottom:0;background:var(--fondoApp,#F3EEF1)}
+  /* Dentro del panel las apps no reciben la zona segura del móvil (la barrita de inicio del iPhone):
+     se deja ese hueco abajo, pintado con el color de la propia app, para que su menú no quede pegado al borde. */
+  #marco iframe{top:0;bottom:auto;height:calc(100% - max(env(safe-area-inset-bottom),6px));background:var(--fondoApp,#fff)}
 }
 .pieDos{display:flex;gap:8px;margin-bottom:8px}
 .pieDos .pildora{flex:1;height:44px}
