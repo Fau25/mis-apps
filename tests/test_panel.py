@@ -72,6 +72,11 @@ with sync_playwright() as p:
     pg.evaluate("localStorage.setItem('mp-datos', JSON.stringify({pedidos:[{estado:'in_transit'},{estado:'delivered'}]}))")
     pg.reload(); pg.wait_for_timeout(600)
     ok(pg.locator('.ficha[data-id=pedidos] small').inner_text() == '1 pedido en camino', 'las fichas muestran el dato vivo de cada app', pg.locator('.ficha[data-id=pedidos] small').inner_text())
+    pg.evaluate("""() => { const d = new Date(), h = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      localStorage.setItem('midia-v1', JSON.stringify({ tasks: [{ id: 'a', t: 'Tarea de prueba', d: '2000-01-01' }, { id: 'b', t: 'Otra', d: h }], events: [], bdays: [] }));
+      localStorage.setItem('habitos-v1', JSON.stringify({ habitos: [{ id: '1', nombre: 'Leer', frecuencia: 'diario', dias: [], creado: '2000-01-01', hechos: {} }] })); }""")
+    pg.reload(); pg.wait_for_timeout(600)
+    ok(pg.locator('#pendiente').is_visible() and pg.locator('#pendCuenta').inner_text() == '· 3' and pg.locator('.pendChip').first.inner_text() == 'Atrasada', '«Pendiente hoy» junta Mi Día y Hábitos, lo atrasado primero', pg.locator('#pendiente').inner_text())
     ok(pg.locator('#navMovil .nb').count() == 2 and all(t for t in pg.locator('#navMovil .nb span').all_inner_texts()), 'menú inferior: 2 pestañas, todas con nombre')
     ok(not err, 'sin errores de JavaScript (móvil)', err)
     c.close()

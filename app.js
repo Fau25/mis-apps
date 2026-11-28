@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = 'v27';
+const VERSION = 'v28';
 const MOVIL = matchMedia('(max-width:700px)'); // en el móvil cada app se abre a pantalla completa dentro del panel (sin salir al navegador)
 const MAX_VIVAS = MOVIL.matches ? 3 : 5;   // en el móvil, menos apps vivas a la vez para no gastar memoria // apps que se mantienen cargadas para volver al instante
 const PASTEL = ['#E4DDF4', '#DDEFE1', '#F7EFCF', '#DCEBFB', '#F8E1EA', '#FBE6D6'];
@@ -236,8 +236,71 @@ const VIVO = {
     return n ? plural(n, 'pedido en camino', 'pedidos en camino') : 'Sin envíos pendientes';
   }
 };
+// ---- «Pendiente hoy»: lo de Mi Día (tareas, eventos, cumpleaños) y Hábitos, ordenado por urgencia ----
+let pendTodo = false;
+function pendientes() {
+  const h = hoyISO();
+  const m = new Date(); m.setDate(m.getDate() + 1);
+  const man = m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0') + '-' + String(m.getDate()).padStart(2, '0');
+  const md = (d) => String(d || '').slice(-5);
+  const L = [], despues = [];
+  let conectada = false;
+  const dia = leerJSON('midia-v1', null);
+  if (dia && Array.isArray(dia.tasks)) {
+    conectada = true;
+    dia.tasks.filter((x) => !x.done && !x.del && x.d && x.d < h).sort((a, b) => a.d.localeCompare(b.d))
+      .forEach((x) => L.push({ app: 'dia', t: x.t, c: 'Atrasada', urg: true, n: 1 }));
+    dia.tasks.filter((x) => !x.done && !x.del && x.d === h).forEach((x) => L.push({ app: 'dia', t: x.t, c: 'Hoy', n: 1 }));
+    (dia.events || []).filter((e) => e.d === h && !e.del).sort((a, b) => String(a.h || '').localeCompare(String(b.h || '')))
+      .forEach((e) => L.push({ app: 'dia', t: e.t, c: e.h || 'Hoy', n: 1 }));
+    (dia.bdays || []).forEach((b) => {
+      if (md(b.d) === h.slice(5)) L.push({ app: 'dia', t: 'Cumple de ' + b.t, c: 'Hoy', n: 1 });
+      else if (md(b.d) === man.slice(5)) despues.push({ app: 'dia', t: 'Cumple de ' + b.t, c: 'Mañana', n: 0 });
+    });
+  }
+  const hab = leerJSON('habitos-v1', null);
+  if (hab && Array.isArray(hab.habitos)) {
+    conectada = true;
+    const dow = new Date().getDay();
+    const faltan = hab.habitos.filter((x) => (!x.creado || x.creado <= h) && (x.frecuencia === 'diario' || (x.dias || []).includes(dow)) && !(x.hechos && x.hechos[h]));
+    if (faltan.length) L.push({ app: 'habitos', t: faltan.map((x) => x.nombre).join(' · '), c: plural(faltan.length, 'hábito', 'hábitos'), n: faltan.length });
+  }
+  return conectada ? L.concat(despues) : null;
+}
+function pintarPendiente() {
+  const L = pendientes();
+  const sec = $('pendiente');
+  if (!L) { sec.hidden = true; return; }
+  sec.hidden = false;
+  const total = L.reduce((s, x) => s + x.n, 0);
+  $('pendCuenta').textContent = total ? '· ' + total : '';
+  const lista = $('pendLista');
+  lista.textContent = '';
+  if (!L.length) { lista.appendChild(el('p', 'pendVacio', 'Todo hecho por hoy')); $('pendMas').hidden = true; return; }
+  const MAX = 4;
+  (pendTodo ? L : L.slice(0, MAX)).forEach((x) => {
+    const a = APPS.find((p) => p.id === x.app);
+    const b = el('button', 'pendFila');
+    b.type = 'button';
+    const t = el('span', 'tile');
+    t.appendChild(icono(a.d));
+    t.style.background = ['var(--g1)', 'var(--g2)', 'var(--g3)'][APPS.indexOf(a) % 3];
+    const c = el('span', 'pendChip' + (x.urg ? ' urg' : ''), x.c);
+    b.append(t, el('span', 'pendTxt', x.t), c);
+    b.setAttribute('aria-label', x.t + ', ' + x.c + ' (abrir ' + a.nombre + ')');
+    b.addEventListener('click', () => abrir(a.id));
+    lista.appendChild(b);
+  });
+  const mas = $('pendMas');
+  mas.hidden = L.length <= MAX;
+  mas.firstChild.textContent = pendTodo ? 'Ver menos' : 'Ver todo';
+  mas.setAttribute('aria-expanded', String(pendTodo));
+}
+$('pendMas').addEventListener('click', () => { pendTodo = !pendTodo; pintarPendiente(); });
+
 let leyendoVivos = false;
 async function leerVivos() {
+  try { pintarPendiente(); } catch (e) {}
   if (leyendoVivos) return;
   leyendoVivos = true;
   for (const a of APPS) {

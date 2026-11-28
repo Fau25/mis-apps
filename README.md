@@ -7,6 +7,7 @@ Web: https://fau25.github.io/mis-apps/ (instalable: Chrome/Edge en el PC, «Aña
 - Cada app se abre dentro del panel en un iframe con su ruta de fau25.github.io (misma dirección), así conserva sus datos, sesiones y service worker.
 - En el ordenador: barra lateral a la izquierda y la app a la derecha. Atajos Alt+1…9 y Alt+0 (Inicio).
 - En el móvil: la app ocupa toda la pantalla, con una barra fina arriba: «‹ Mis apps» vuelve (o el gesto «atrás») y ▦ (o mantener pulsado «‹ Mis apps») abre una hoja para saltar a otra app o recargar la actual.
+- Arriba del Inicio, «Pendiente hoy» junta lo de Mi Día (tareas atrasadas y de hoy, eventos y cumpleaños) y los hábitos que faltan, ordenado por urgencia; «Ver todo» enseña el resto. Tocar una fila abre su app.
 - Cada ficha del Inicio muestra un dato vivo de su app (tareas de hoy, hábitos hechos, cosas por comprar, próxima vacuna, próximo viaje, devoluciones, pedidos en camino). Se lee en solo lectura lo que cada app guarda en este dispositivo. Abajo se deja la zona segura del teléfono, pintada con el color de la app.
 - Se mantienen cargadas las últimas apps usadas (`MAX_VIVAS`: 5 en el PC, 3 en el móvil) para volver al instante.
 - `#id` en la dirección abre esa app (p. ej. `#dia`); `#scripts` abre el apartado Scripts.

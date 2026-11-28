@@ -44,6 +44,13 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
         </button>
       </header>
+      <section id="pendiente" class="pendiente" aria-labelledby="pendTit" hidden>
+        <div class="pendCab">
+          <h2 id="pendTit">Pendiente hoy <span id="pendCuenta"></span></h2>
+          <button id="pendMas" class="pendMas" type="button" aria-expanded="false" hidden>Ver todo<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+        <div id="pendLista"></div>
+      </section>
       <div class="subcab">
         <h2>Mis apps</h2>
         <span id="cuenta"></span>
